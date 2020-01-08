@@ -1,0 +1,17 @@
+{
+    "files.exclude": {
+        ".dart_tool": true,
+        ".firebase": true,
+        ".firebaserc": true,
+        ".idea": true,
+        ".metadata": true,
+        ".packages": true,
+        ".vscode": true,
+        "android/": true,
+        "build/": true,
+        "firebase.json": true,
+        "ios/": true,
+        "is3103.iml": true,
+        "pubspec.lock": true
+    }
+}
