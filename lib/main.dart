@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'config.dart';
 import 'package:provider/provider.dart';
 import 'notifiers.dart';
+import 'dataClasses.dart';
 
 void main() => runApp(MyApp());
 
@@ -48,12 +49,12 @@ class DisplayCards extends StatelessWidget {
 List<Widget> generateCards(quizzes) {
   // solve flutter flow-control-collections needed - https://stackoverflow.com/questions/59458433/flutter-flow-control-collections-are-needed-but-are-they
   return <Widget>[
-    for (String quizData in quizzes) CardContainer(cardData: quizData)
+    for (QuizInfo quizData in quizzes) CardContainer(cardData: quizData)
   ];
 }
 
 class CardContainer extends StatelessWidget {
-  final String cardData;
+  final QuizInfo cardData;
 
   const CardContainer({Key key, this.cardData}) : super(key: key);
 
@@ -72,11 +73,11 @@ class CardContainer extends StatelessWidget {
 }
 
 class CardContents extends StatelessWidget {
-  final String cardData;
+  final QuizInfo cardData;
 
   const CardContents({Key key, this.cardData}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Expanded(child: ListTile(title: Text(cardData)));
+    return Expanded(child: ListTile(title: Text(cardData.title)));
   }
 }
