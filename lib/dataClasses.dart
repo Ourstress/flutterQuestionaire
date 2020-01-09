@@ -1,18 +1,22 @@
+import 'package:firebase/firestore.dart';
+
 class QuizInfo {
+  final String id;
   final String title;
   final String desc;
   // final ResponseList responseList;
 
-  QuizInfo(this.title, this.desc); //, this.responseList);
+  QuizInfo({this.id, this.title, this.desc}); //, this.responseList);
 
-  QuizInfo.fromJson(Map<String, dynamic> json)
-      : title = json['title'],
-        desc = json['desc'];
+  factory QuizInfo.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data();
 
-  Map<String, dynamic> toJson() => {
-        'title': title,
-        'desc': desc,
-      };
+    return QuizInfo(
+      id: doc.id ?? '',
+      title: data['title'] ?? '',
+      desc: data['desc'] ?? '',
+    );
+  }
 }
 
 // class ResponseList {

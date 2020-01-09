@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'dart:convert';
 import 'dataClasses.dart';
+import 'package:firebase/firebase.dart' as fb;
+import 'package:firebase/firestore.dart';
 
-// Todo: proxy data provider on connection to Firestore
-class DataProvider with ChangeNotifier {
-  final String responseBody = """[{"title":"hello", "desc":"hello world"},
-    {"title":"hello2", "desc":"hello world 2"}]""";
+class Fs with ChangeNotifier {
+  Firestore store = fb.firestore();
+  Firestore get getStore => store;
 
-  parseJson() => json.decode(responseBody).cast<Map<String, dynamic>>();
-  List<QuizInfo> parseQuizzes() =>
-      parseJson().map<QuizInfo>((json) => QuizInfo.fromJson(json)).toList();
+  CollectionReference quizRef() => getStore.collection('quiz');
 
-  List<QuizInfo> get getQuizzes => parseQuizzes();
+  Stream<List<QuizInfo>> streamQuizzes() => quizRef().onSnapshot.map(
+      (list) => list.docs.map((doc) => QuizInfo.fromFirestore(doc)).toList());
 }

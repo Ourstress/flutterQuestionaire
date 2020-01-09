@@ -2,6 +2,7 @@
 .Firebase
 .firebaserc
 firebase.json
+lib/secrets.dart
 
 # Miscellaneous
 *.class

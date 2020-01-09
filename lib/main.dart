@@ -3,8 +3,23 @@ import 'config.dart';
 import 'package:provider/provider.dart';
 import 'notifiers.dart';
 import 'dataClasses.dart';
+import 'package:firebase/firebase.dart' as fb;
+import 'secrets.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  if (fb.apps.length == 0) {
+    fb.initializeApp(
+        apiKey: secrets['apiKey'],
+        authDomain: secrets['authDomain'],
+        databaseURL: secrets['databaseURL'],
+        projectId: secrets['projectId'],
+        storageBucket: secrets['storageBucket'],
+        messagingSenderId: secrets['messagingSenderId'],
+        appId: secrets['appId'],
+        measurementId: secrets['measurementId']);
+  }
+  return runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -14,9 +29,15 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blueGrey,
         ),
-        home: MultiProvider(providers: [
-          ChangeNotifierProvider(create: (context) => DataProvider()),
-        ], child: MyHomePage()));
+        home: MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => Fs()),
+            ],
+            child: StreamProvider<List<QuizInfo>>(
+                create: (context) =>
+                    Provider.of<Fs>(context, listen: false).streamQuizzes(),
+                initialData: [],
+                child: MyHomePage())));
   }
 }
 
@@ -36,12 +57,11 @@ class DisplayCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(12.0),
         child: Wrap(
           spacing: config['wrapCardSpacing'],
           runSpacing: config['wrapCardRunSpacing'],
-          children: generateCards(
-              Provider.of<DataProvider>(context, listen: false).getQuizzes),
+          children: generateCards(Provider.of<List<QuizInfo>>(context)),
         ));
   }
 }
