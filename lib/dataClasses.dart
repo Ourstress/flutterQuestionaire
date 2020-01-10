@@ -68,7 +68,8 @@ class QuizQnScore {
 }
 
 class QuizQuestion {
-  final List<String> quiz;
+  final String id;
+  final List quiz;
   final String scales;
   final String title;
   final String type;
@@ -84,7 +85,20 @@ class QuizQuestion {
     }).toList();
   }
 
-  QuizQuestion(this.quiz, this.scales, this.title, this.type);
+  QuizQuestion({this.id, this.quiz, this.scales, this.title, this.type});
+
+  factory QuizQuestion.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data();
+
+    return QuizQuestion(
+      id: doc.id ?? '',
+      quiz: data['quiz'] ?? [],
+      title: data['title'] ?? '',
+      scales: data['scales'] ??
+          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
+      type: data['type'] ?? '',
+    );
+  }
 }
 
 class QuizQnScale {

@@ -103,11 +103,21 @@ class CardContents extends StatelessWidget {
     return Expanded(
         child: ListTile(
       title: Text(cardData.title),
-      onTap: () => openQuiz(context),
+      onTap: () => openQuiz(context, cardData),
     ));
   }
 }
 
-void openQuiz(context) {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => Quiz()));
+void openQuiz(context, QuizInfo cardData) {
+  var contextFirestore = Provider.of<Fs>(context, listen: false);
+
+  Navigator.push(context, MaterialPageRoute(builder: (context) {
+    return ChangeNotifierProvider.value(
+        value: contextFirestore,
+        child: StreamProvider<List<QuizQuestion>>(
+            create: (context) => Provider.of<Fs>(context, listen: false)
+                .streamQuizQuestion(cardData.id),
+            initialData: [],
+            child: Quiz(quizInfo: cardData)));
+  }));
 }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dataClasses.dart';
 import 'config.dart';
+import 'package:provider/provider.dart';
 
 class Quiz extends StatefulWidget {
+  final QuizInfo quizInfo;
+
+  const Quiz({Key key, this.quizInfo}) : super(key: key);
   @override
   QuizState createState() => QuizState();
 }
@@ -21,32 +25,8 @@ class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    List<QuizQuestion> questions = [
-      QuizQuestion([],
-          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
-          'hello',
-          'hey'),
-      QuizQuestion([],
-          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
-          'hello 1',
-          'hey'),
-      QuizQuestion([],
-          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
-          'hello 2',
-          'hey'),
-      QuizQuestion([],
-          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
-          'hello 3',
-          'hey'),
-      QuizQuestion([],
-          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
-          'hello 4',
-          'hey'),
-      QuizQuestion([],
-          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
-          'hello 5',
-          'hey')
-    ];
+    print(Provider.of<List<QuizQuestion>>(context));
+    List<QuizQuestion> questions = Provider.of<List<QuizQuestion>>(context);
     return Scaffold(
         appBar: AppBar(title: Text('Quiz')),
         body: ListView(
