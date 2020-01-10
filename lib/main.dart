@@ -48,7 +48,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('IS3103 App'),
+        title: Text(config['appName']),
       ),
       body: DisplayCards(),
     );
@@ -59,7 +59,7 @@ class DisplayCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(12.0),
+        padding: EdgeInsets.all(config['outermostPadding']),
         child: Wrap(
           spacing: config['wrapCardSpacing'],
           runSpacing: config['wrapCardRunSpacing'],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dataClasses.dart';
+import 'config.dart';
 
 class Quiz extends StatefulWidget {
   @override
@@ -7,14 +8,64 @@ class Quiz extends StatefulWidget {
 }
 
 class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
+  Map _scores = {};
+
+  void updateQuizScore({String question, String questionType, int value}) {
+    if (!_scores.containsKey(question)) {
+      _scores[question] = {};
+      _scores[question]['type'] = questionType;
+    }
+    _scores[question]['score'] = value;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    QuizQuestion question = QuizQuestion([],
-        '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
-        'hello',
-        'hey');
-    return Card(child: QuizQnTile(quizQn: question, index: 1));
+    List<QuizQuestion> questions = [
+      QuizQuestion([],
+          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
+          'hello',
+          'hey'),
+      QuizQuestion([],
+          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
+          'hello 1',
+          'hey'),
+      QuizQuestion([],
+          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
+          'hello 2',
+          'hey'),
+      QuizQuestion([],
+          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
+          'hello 3',
+          'hey'),
+      QuizQuestion([],
+          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
+          'hello 4',
+          'hey'),
+      QuizQuestion([],
+          '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
+          'hello 5',
+          'hey')
+    ];
+    return Scaffold(
+        appBar: AppBar(title: Text('Quiz')),
+        body: ListView(
+            padding: EdgeInsets.all(config['outermostPadding']),
+            children: <Widget>[
+              for (QuizQuestion question in questions)
+                Card(
+                    margin: EdgeInsets.all(config['outermostPadding']),
+                    child: QuizQnTile(
+                        quizQn: question,
+                        index: 1,
+                        updateQuizScore: updateQuizScore)),
+              // use Align to prevent RaisedButton from being max width https://stackoverflow.com/questions/55580066/how-can-you-reduce-the-width-of-a-raisedbutton-inside-a-listview-builder
+              Align(
+                  child: RaisedButton(
+                onPressed: () {},
+                child: Text('Submit'),
+              )),
+            ]));
   }
 
   @override
@@ -24,7 +75,9 @@ class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
 class QuizQnTile extends StatefulWidget {
   final QuizQuestion quizQn;
   final int index;
-  const QuizQnTile({Key key, this.quizQn, this.index}) : super(key: key);
+  final Function updateQuizScore;
+  const QuizQnTile({Key key, this.quizQn, this.index, this.updateQuizScore})
+      : super(key: key);
 
   @override
   QuizQnTileState createState() => QuizQnTileState();
@@ -32,14 +85,21 @@ class QuizQnTile extends StatefulWidget {
 
 class QuizQnTileState extends State<QuizQnTile> {
   int radioGroupScore = -1;
-  void onSelectRadio(value) => setState(() {
-        radioGroupScore = value;
-      });
+
+  QuizQuestion quizQn() => widget.quizQn;
+
+  void onSelectRadio(value) {
+    setState(() {
+      radioGroupScore = value;
+    });
+    widget.updateQuizScore(
+        question: quizQn().title, questionType: quizQn().type, value: value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    QuizQuestion quizQn = widget.quizQn;
     return ListTile(
-        title: Text((widget.index + 1).toString() + '.  ' + quizQn.title),
+        title: Text((widget.index + 1).toString() + '.  ' + quizQn().title),
         contentPadding: EdgeInsets.all(20.0),
         subtitle: Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -47,7 +107,7 @@ class QuizQnTileState extends State<QuizQnTile> {
                 crossAxisAlignment: WrapCrossAlignment.end,
                 alignment: WrapAlignment.spaceEvenly,
                 children: radioButtonBar(
-                    quizQn: quizQn,
+                    quizQn: quizQn(),
                     radioGroupScore: radioGroupScore,
                     clickHandler: onSelectRadio))));
   }

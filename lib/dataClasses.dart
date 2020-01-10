@@ -1,5 +1,72 @@
 import 'package:firebase/firestore.dart';
 
+class QuizLogic {
+  final Map _scores;
+
+  QuizLogic(this._scores);
+
+  TabulatedScore tabulateScores() {
+    List<QuizQnScore> _quizQnList = [];
+    for (MapEntry qnAnswers in _scores.entries) {
+      _quizQnList.add(QuizQnScore.fromMapEntry(qnAnswers));
+    }
+    Map tabulatedScores = _addScores(scores: _quizQnList);
+    String quizOutcome = _findOutcome(tabulatedScores: tabulatedScores);
+    return TabulatedScore(
+        tabulatedScores: tabulatedScores, outcome: quizOutcome);
+  }
+
+  String _findOutcome({Map tabulatedScores}) {
+    int _highestScore = 0;
+    String _outcome = '';
+    for (String outcomeType in tabulatedScores.keys) {
+      if (tabulatedScores[outcomeType] > _highestScore) {
+        _outcome = outcomeType;
+        _highestScore = tabulatedScores[outcomeType];
+      } else if (tabulatedScores[outcomeType] == _highestScore) {
+        _outcome += ' / ' + outcomeType;
+      }
+    }
+    return _outcome;
+  }
+
+  Map _addScores({List<QuizQnScore> scores}) {
+    Map tabulatedScores = {};
+    scores.forEach((quizQnScore) {
+      if (!tabulatedScores.containsKey(quizQnScore.type)) {
+        tabulatedScores[quizQnScore.type] = 0;
+      }
+      tabulatedScores[quizQnScore.type] += quizQnScore.score;
+    });
+    return tabulatedScores;
+  }
+}
+
+class TabulatedScore {
+  final Map tabulatedScores;
+  final String outcome;
+
+  TabulatedScore({this.tabulatedScores, this.outcome});
+}
+
+class QuizQnScore {
+  final String title;
+  final String type;
+  final int score;
+
+  QuizQnScore({this.title, this.type, this.score});
+
+  factory QuizQnScore.fromMapEntry(MapEntry quizQnScore) {
+    String qnTitle = quizQnScore.key;
+    Map qnValues = quizQnScore.value;
+    return QuizQnScore(
+      title: qnTitle ?? '',
+      type: qnValues['type'] ?? '',
+      score: qnValues['score'] ?? 0,
+    );
+  }
+}
+
 class QuizQuestion {
   final List<String> quiz;
   final String scales;
