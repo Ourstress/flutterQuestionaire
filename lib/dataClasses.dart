@@ -1,5 +1,32 @@
 import 'package:firebase/firestore.dart';
 
+class QuizQuestion {
+  final List<String> quiz;
+  final String scales;
+  final String title;
+  final String type;
+
+  List<QuizQnScale> get getQuizScales {
+    return scales.split(',').map((String scale) {
+      // Firefox doesn't recognise named groups, switched to unnamed group - https://stackoverflow.com/questions/55774080/firefox-gives-syntaxerror-invalid-regexp-group
+      RegExp pattern = RegExp(r"(\d+) - (.*)");
+      RegExpMatch matches = pattern.firstMatch(scale);
+      int value = int.parse(matches.group(1));
+      String label = matches.group(2);
+      return QuizQnScale(value, label);
+    }).toList();
+  }
+
+  QuizQuestion(this.quiz, this.scales, this.title, this.type);
+}
+
+class QuizQnScale {
+  final int value;
+  final String label;
+
+  QuizQnScale(this.value, this.label);
+}
+
 class QuizInfo {
   final String id;
   final String title;

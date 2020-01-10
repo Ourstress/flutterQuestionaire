@@ -5,6 +5,7 @@ import 'notifiers.dart';
 import 'dataClasses.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'secrets.dart';
+import 'quiz.dart';
 
 void main() {
   if (fb.apps.length == 0) {
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
             providers: [
               ChangeNotifierProvider(create: (context) => Fs()),
             ],
+            // reference for streamProvider https://github.com/fireship-io/185-advanced-flutter-firestore/blob/master/lib/main.dart
             child: StreamProvider<List<QuizInfo>>(
                 create: (context) =>
                     Provider.of<Fs>(context, listen: false).streamQuizzes(),
@@ -98,6 +100,14 @@ class CardContents extends StatelessWidget {
   const CardContents({Key key, this.cardData}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Expanded(child: ListTile(title: Text(cardData.title)));
+    return Expanded(
+        child: ListTile(
+      title: Text(cardData.title),
+      onTap: () => openQuiz(context),
+    ));
   }
+}
+
+void openQuiz(context) {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => Quiz()));
 }
