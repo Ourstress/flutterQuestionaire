@@ -5,5 +5,8 @@ Map config = {
   'cardContainerMinHeight': 100,
   'wrapCardSpacing': 15,
   'wrapCardRunSpacing': 10,
-  'outermostPadding': 12
+  'outermostPadding': 12,
+  'emphasisTextPadding': 25,
+  'quizResultsFontSize': 25,
+  'normalFontSize': 18
 };

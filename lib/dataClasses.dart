@@ -3,8 +3,9 @@ import 'package:firebase/firestore.dart';
 class QuizData extends QuizLogic {
   final Map collatedScores;
   final Map questionScores;
+  final QuizInfo quizInfo;
 
-  QuizData({this.collatedScores, this.questionScores})
+  QuizData({this.collatedScores, this.questionScores, this.quizInfo})
       : super(collatedScores: collatedScores);
 }
 
@@ -120,18 +121,26 @@ class QuizInfo {
   final String id;
   final String title;
   final String desc;
+  final String instructions;
+  final String resultsExplanation;
   // final ResponseList responseList;
 
-  QuizInfo({this.id, this.title, this.desc}); //, this.responseList);
+  QuizInfo(
+      {this.id,
+      this.title,
+      this.desc,
+      this.instructions,
+      this.resultsExplanation}); //, this.responseList);
 
   factory QuizInfo.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data();
 
     return QuizInfo(
-      id: doc.id ?? '',
-      title: data['title'] ?? '',
-      desc: data['desc'] ?? '',
-    );
+        id: doc.id ?? '',
+        title: data['title'] ?? '',
+        desc: data['desc'] ?? '',
+        instructions: data['instructions'] ?? '',
+        resultsExplanation: data['resultsExplanation'] ?? '');
   }
 }
 

@@ -13,7 +13,13 @@ class Quiz extends StatefulWidget {
 }
 
 class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
-  QuizData quizData = QuizData(collatedScores: {}, questionScores: {});
+  QuizData quizData;
+
+  void initState() {
+    quizData = QuizData(
+        collatedScores: {}, questionScores: {}, quizInfo: widget.quizInfo);
+    super.initState();
+  }
 
   void updateQuizScore({String question, String questionType, int value}) {
     if (!quizData.collatedScores.containsKey(question)) {
@@ -33,8 +39,7 @@ class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
       showDialog(
           context: context,
           child: AlertDialog(
-              title: Text(config['reqInfoToSubmit']),
-              content: EmailGenderForm(quizData: quizData),
+              content: SubmitQuizForm(quizData: quizData),
               actions: [
                 FlatButton(
                     child: const Text('EXIT'),
