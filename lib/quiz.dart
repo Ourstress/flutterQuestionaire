@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dataClasses.dart';
 import 'config.dart';
 import 'package:provider/provider.dart';
+import 'forms.dart';
 
 class Quiz extends StatefulWidget {
   final QuizInfo quizInfo;
@@ -12,44 +13,92 @@ class Quiz extends StatefulWidget {
 }
 
 class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
-  Map _scores = {};
+  QuizData quizData = QuizData(collatedScores: {}, questionScores: {});
 
   void updateQuizScore({String question, String questionType, int value}) {
-    if (!_scores.containsKey(question)) {
-      _scores[question] = {};
-      _scores[question]['type'] = questionType;
+    if (!quizData.collatedScores.containsKey(question)) {
+      quizData.collatedScores[question] = {};
+      quizData.collatedScores[question]['type'] = questionType;
     }
-    _scores[question]['score'] = value;
+    quizData.collatedScores[question]['score'] = value;
+    quizData.questionScores[question] = value;
+  }
+
+  void onSubmit(questions) {
+    if (quizData.questionScores.length != questions.length)
+      showAlert(
+          context: context,
+          alertMessage: 'Please answer all the questions before submitting');
+    else
+      showDialog(
+          context: context,
+          child: AlertDialog(
+              title: Text(config['reqInfoToSubmit']),
+              content: EmailGenderForm(quizData: quizData),
+              actions: [
+                FlatButton(
+                    child: const Text('EXIT'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    }),
+              ]));
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    print(Provider.of<List<QuizQuestion>>(context));
-    List<QuizQuestion> questions = Provider.of<List<QuizQuestion>>(context);
+    // listening to provider in build method - see https://medium.com/flutter-community/flutter-statemanagement-with-provider-ee251bbc5ac1
+    final List<QuizQuestion> questions =
+        Provider.of<List<QuizQuestion>>(context);
     return Scaffold(
         appBar: AppBar(title: Text('Quiz')),
-        body: ListView(
-            padding: EdgeInsets.all(config['outermostPadding']),
-            children: <Widget>[
-              for (QuizQuestion question in questions)
-                Card(
-                    margin: EdgeInsets.all(config['outermostPadding']),
-                    child: QuizQnTile(
-                        quizQn: question,
-                        index: 1,
-                        updateQuizScore: updateQuizScore)),
-              // use Align to prevent RaisedButton from being max width https://stackoverflow.com/questions/55580066/how-can-you-reduce-the-width-of-a-raisedbutton-inside-a-listview-builder
-              Align(
-                  child: RaisedButton(
-                onPressed: () {},
-                child: Text('Submit'),
-              )),
-            ]));
+        body: QuestionList(
+            questions: questions,
+            scoreUpdater: updateQuizScore,
+            onSubmit: () => onSubmit(questions)));
   }
 
   @override
   bool get wantKeepAlive => true;
+}
+
+Future showAlert({BuildContext context, String alertMessage}) {
+  return showDialog(
+      context: context,
+      child: AlertDialog(title: Text(alertMessage), actions: [
+        FlatButton(
+            child: const Text('CLOSE'),
+            onPressed: () => Navigator.of(context).pop()),
+      ]));
+}
+
+class QuestionList extends StatelessWidget {
+  final List<QuizQuestion> questions;
+  final Function scoreUpdater;
+  final Function onSubmit;
+
+  const QuestionList(
+      {Key key, this.questions, this.scoreUpdater, this.onSubmit})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+        padding: EdgeInsets.all(config['outermostPadding']),
+        children: <Widget>[
+          for (QuizQuestion question in questions)
+            Card(
+                margin: EdgeInsets.all(config['outermostPadding']),
+                child: QuizQnTile(
+                    quizQn: question, index: 1, updateQuizScore: scoreUpdater)),
+          // use Align to prevent RaisedButton from being max width https://stackoverflow.com/questions/55580066/how-can-you-reduce-the-width-of-a-raisedbutton-inside-a-listview-builder
+          Align(
+              child: RaisedButton(
+            onPressed: () => onSubmit(),
+            child: Text('Submit'),
+          )),
+        ]);
+  }
 }
 
 class QuizQnTile extends StatefulWidget {

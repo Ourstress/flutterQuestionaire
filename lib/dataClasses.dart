@@ -1,13 +1,21 @@
 import 'package:firebase/firestore.dart';
 
-class QuizLogic {
-  final Map _scores;
+class QuizData extends QuizLogic {
+  final Map collatedScores;
+  final Map questionScores;
 
-  QuizLogic(this._scores);
+  QuizData({this.collatedScores, this.questionScores})
+      : super(collatedScores: collatedScores);
+}
+
+class QuizLogic {
+  final Map collatedScores;
+
+  QuizLogic({this.collatedScores});
 
   TabulatedScore tabulateScores() {
     List<QuizQnScore> _quizQnList = [];
-    for (MapEntry qnAnswers in _scores.entries) {
+    for (MapEntry qnAnswers in collatedScores.entries) {
       _quizQnList.add(QuizQnScore.fromMapEntry(qnAnswers));
     }
     Map tabulatedScores = _addScores(scores: _quizQnList);
