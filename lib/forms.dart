@@ -17,13 +17,80 @@ class SubmitQuizForm extends StatefulWidget {
 }
 
 class SubmitQuizFormState extends State<SubmitQuizForm> {
-  final _formKey = GlobalKey<FormState>();
-  String _gender = 'Female';
-  String _email = '';
+  final submitQuizFormKey = GlobalKey<FormState>();
+  QuizSubmitDataInput quizInput = QuizSubmitDataInput();
 
   @override
   Widget build(BuildContext context) {
-    return DisplayResults(quizData: widget.quizData);
+    return Form(
+        key: submitQuizFormKey,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Flexible(
+              child: TextFormField(
+            onSaved: (String value) => quizInput.setEmail = value,
+            decoration: InputDecoration(
+              labelText: config['inputEmailLabel'],
+            ),
+            validator: (value) {
+              RegExp pattern = RegExp(config['checkEmailRegex']);
+              if (value.isEmpty || !pattern.hasMatch(value)) {
+                return config['incorrectInputEmailMsg'];
+              }
+              return null;
+            },
+          )),
+          Flexible(
+              child: DropdownButtonFormField<String>(
+            value: quizInput.gender,
+            decoration: InputDecoration(
+              labelText: 'Please enter your gender',
+            ),
+            isExpanded: true,
+            icon: Icon(Icons.arrow_downward),
+            iconSize: 24,
+            elevation: 16,
+            onChanged: (String newValue) {
+              setState(() {
+                quizInput.setGender = newValue;
+              });
+            },
+            items: <String>['male', 'female']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          )),
+          Flexible(
+              child: SubmitQuizButton(
+                  submitQuizFormKey: submitQuizFormKey,
+                  quizData: widget.quizData,
+                  quizInput: quizInput))
+        ]));
+    // return DisplayResults(quizData: widget.quizData);
+  }
+}
+
+class SubmitQuizButton extends StatelessWidget {
+  final GlobalKey<FormState> submitQuizFormKey;
+  final QuizData quizData;
+  final QuizSubmitDataInput quizInput;
+
+  const SubmitQuizButton(
+      {Key key, this.submitQuizFormKey, this.quizData, this.quizInput})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton(
+        child: Text('Submit'),
+        onPressed: () {
+          if (submitQuizFormKey.currentState.validate()) {
+            submitQuizFormKey.currentState.save();
+          }
+          print(quizData.tabulateScores().outcome);
+        });
   }
 }
 
