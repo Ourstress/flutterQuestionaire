@@ -176,7 +176,30 @@ class DisplayResults extends StatelessWidget {
                 _quizDataInfo.resultsExplanation.replaceAll("\\n", "\n"),
             padding: config['outermostPadding'],
             fontWeight: FontWeight.w300,
-            fontSize: config['normalFontSize'])
+            fontSize: config['normalFontSize']),
+        ResultDisplayText(
+            displayText: 'Your Scores',
+            padding: config['outermostPadding'],
+            fontWeight: FontWeight.w600,
+            fontSize: config['normalFontSize']),
+        DataTable(
+          columns: [
+            DataColumn(
+                label: DataTableText(
+                    displayText: config['resultTableCategoryKey'])),
+            DataColumn(
+                label: DataTableText(
+                    displayText: config['resultTableCategoryValue'])),
+          ],
+          rows: [
+            for (MapEntry scoresMapEntry in _quizScores.tabulatedScores.entries)
+              DataRow(cells: [
+                DataCell(DataTableText(displayText: scoresMapEntry.key)),
+                DataCell(
+                    DataTableText(displayText: scoresMapEntry.value.toString()))
+              ])
+          ],
+        )
       ],
     );
   }
@@ -202,5 +225,17 @@ class ResultDisplayText extends StatelessWidget {
             padding: EdgeInsets.all(padding),
             child: Text(displayText,
                 style: TextStyle(fontWeight: fontWeight, fontSize: fontSize))));
+  }
+}
+
+class DataTableText extends StatelessWidget {
+  final String displayText;
+
+  const DataTableText({Key key, this.displayText}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(displayText,
+        style: TextStyle(fontSize: config['normalFontSize']));
   }
 }
