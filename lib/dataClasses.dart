@@ -128,14 +128,15 @@ class QuizInfo {
   final String desc;
   final String instructions;
   final String resultsExplanation;
-  // final ResponseList responseList;
+  final ResponseList responseList;
 
   QuizInfo(
       {this.id,
       this.title,
       this.desc,
       this.instructions,
-      this.resultsExplanation}); //, this.responseList);
+      this.resultsExplanation,
+      this.responseList});
 
   factory QuizInfo.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data();
@@ -145,29 +146,53 @@ class QuizInfo {
         title: data['title'] ?? '',
         desc: data['desc'] ?? '',
         instructions: data['instructions'] ?? '',
-        resultsExplanation: data['resultsExplanation'] ?? '');
+        resultsExplanation: data['resultsExplanation'] ?? '',
+        responseList: ResponseList.fromFirestore(data['responseList']));
   }
 }
 
-// class ResponseList {
-//   final String email;
-//   final List<Response> responses;
+class ResponseList {
+  final List<Response> responses;
 
-//   ResponseList(this.email, this.responses);
-// }
+  ResponseList({this.responses});
 
-// class Response {
-//   final DateTime createdAt;
-//   final String gender;
-//   final Results results;
+  factory ResponseList.fromFirestore(Map responsesMap) {
+    return ResponseList(responses: [
+      for (MapEntry responseMapEntry in responsesMap.entries)
+        Response.fromFirestore(responseMapEntry)
+    ]);
+  }
+}
 
-//   Response(this.createdAt, this.gender, this.results);
-// }
+class Response {
+  final DateTime createdAt;
+  final String gender;
+  final Results results;
+  final String email;
 
-// class Results {
-//   final String outcome;
-//   final Map collatedScores;
-//   final Map questionScores;
+  Response({this.createdAt, this.gender, this.results, this.email});
 
-//   Results(this.outcome, this.collatedScores, this.questionScores);
-// }
+  factory Response.fromFirestore(MapEntry responseMapEntry) {
+    return Response(
+        createdAt: responseMapEntry.value['createdAt'] ?? '',
+        gender: responseMapEntry.value['gender'] ?? '',
+        email: responseMapEntry.key ?? '',
+        results:
+            Results.fromFirestore(responseMapEntry.value['results']) ?? '');
+  }
+}
+
+class Results {
+  final String outcome;
+  final Map collatedScores;
+  final Map questionScores;
+
+  Results({this.outcome, this.collatedScores, this.questionScores});
+
+  factory Results.fromFirestore(Map firestoreResults) {
+    return Results(
+        outcome: firestoreResults['outcome'] ?? '',
+        collatedScores: firestoreResults['collatedScores'] ?? {},
+        questionScores: firestoreResults['questionScores'] ?? {});
+  }
+}

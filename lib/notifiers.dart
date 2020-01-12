@@ -28,6 +28,7 @@ class Fs with ChangeNotifier {
         'results': {
           'collatedScores': quizData.collatedScores,
           'questionScores': quizData.questionScores,
+          'outcome': quizData.tabulateScores().outcome
         },
         'gender': quizInput.gender,
         'createdAt': FieldValue.serverTimestamp()
