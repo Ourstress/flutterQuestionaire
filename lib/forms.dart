@@ -3,9 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dataClasses.dart';
 import 'config.dart';
 
-// Todos
-// add placeholder eXXXXX@nus.edu
-// check NUS email format
 class SubmitQuizForm extends StatefulWidget {
   final QuizData quizData;
 
@@ -26,42 +23,19 @@ class SubmitQuizFormState extends State<SubmitQuizForm> {
         key: submitQuizFormKey,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Flexible(
-              child: TextFormField(
-            onSaved: (String value) => quizInput.setEmail = value,
-            decoration: InputDecoration(
-              labelText: config['inputEmailLabel'],
-            ),
-            validator: (value) {
-              RegExp pattern = RegExp(config['checkEmailRegex']);
-              if (value.isEmpty || !pattern.hasMatch(value)) {
-                return config['incorrectInputEmailMsg'];
-              }
-              return null;
-            },
+              child: TextFormInput(
+            setter: (value) => quizInput.email = value,
+            labelText: config['inputEmailLabel'],
+            hintText: config['emailHintText'],
+            wrongInputMsg: config['incorrectInputEmailMsg'],
+            regex: config['checkEmailRegex'],
           )),
           Flexible(
-              child: DropdownButtonFormField<String>(
-            value: quizInput.gender,
-            decoration: InputDecoration(
-              labelText: 'Please enter your gender',
-            ),
-            isExpanded: true,
-            icon: Icon(Icons.arrow_downward),
-            iconSize: 24,
-            elevation: 16,
-            onChanged: (String newValue) {
-              setState(() {
-                quizInput.setGender = newValue;
-              });
-            },
-            items: <String>['male', 'female']
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          )),
+              child: SelectDropdown(
+                  dropdownValue: () => quizInput.gender,
+                  setter: (value) => quizInput.gender = value,
+                  labelText: config['inputGenderLabel'],
+                  dropdownOptions: config['genderDropdownOptions'])),
           Flexible(
               child: SubmitQuizButton(
                   submitQuizFormKey: submitQuizFormKey,
@@ -69,6 +43,74 @@ class SubmitQuizFormState extends State<SubmitQuizForm> {
                   quizInput: quizInput))
         ]));
     // return DisplayResults(quizData: widget.quizData);
+  }
+}
+
+class TextFormInput extends StatelessWidget {
+  final Function setter;
+  final String labelText;
+  final String hintText;
+  final String wrongInputMsg;
+  final String regex;
+
+  const TextFormInput(
+      {Key key,
+      this.setter,
+      this.labelText,
+      this.hintText,
+      this.wrongInputMsg,
+      this.regex})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      onSaved: (String value) => setter(value),
+      decoration: InputDecoration(labelText: labelText, hintText: hintText),
+      validator: (value) {
+        RegExp pattern = RegExp(regex);
+        if (value.isEmpty || !pattern.hasMatch(value)) {
+          return wrongInputMsg;
+        }
+        return null;
+      },
+    );
+  }
+}
+
+class SelectDropdown extends StatelessWidget {
+  final Function dropdownValue;
+  final Function setter;
+  final String labelText;
+  final List<String> dropdownOptions;
+
+  SelectDropdown(
+      {Key key,
+      this.dropdownValue,
+      this.setter,
+      this.labelText,
+      this.dropdownOptions})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      value: dropdownValue(),
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+      isExpanded: true,
+      icon: Icon(Icons.arrow_downward),
+      iconSize: 24,
+      elevation: 16,
+      onChanged: (String newValue) => setter(newValue),
+      items: dropdownOptions.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
   }
 }
 

@@ -1,14 +1,8 @@
 import 'package:firebase/firestore.dart';
 
 class QuizSubmitDataInput {
-  String _email = '';
-  String _gender = 'female';
-
-  get email => _email;
-  get gender => _gender;
-
-  set setEmail(String value) => _email = value;
-  set setGender(String value) => _gender = value;
+  String email = '';
+  String gender = 'female';
 }
 
 class QuizData extends QuizLogic {
