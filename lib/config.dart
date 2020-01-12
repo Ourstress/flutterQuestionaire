@@ -2,8 +2,7 @@ Map config = {
   'appName': 'IS3103 App',
   'reqInfoToSubmit': 'Please help to provide us with some further information',
   'genderDropdownOptions': ['male', 'female'],
-  'inputEmailLabel':
-      'Please enter an NUS email. The results will be emailed to you.',
+  'inputEmailLabel': 'Please enter an NUS email.',
   'checkEmailRegex': r"e\d{7}@u.nus.edu$",
   'emailHintText': 'eXXXXXXX@u.nus.edu',
   'incorrectInputEmailMsg':

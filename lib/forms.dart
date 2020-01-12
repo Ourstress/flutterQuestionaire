@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dataClasses.dart';
 import 'config.dart';
+import 'package:provider/provider.dart';
+import 'notifiers.dart';
 
 class SubmitQuizForm extends StatefulWidget {
   final QuizData quizData;
@@ -19,30 +21,34 @@ class SubmitQuizFormState extends State<SubmitQuizForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-        key: submitQuizFormKey,
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Flexible(
-              child: TextFormInput(
-            setter: (value) => quizInput.email = value,
-            labelText: config['inputEmailLabel'],
-            hintText: config['emailHintText'],
-            wrongInputMsg: config['incorrectInputEmailMsg'],
-            regex: config['checkEmailRegex'],
-          )),
-          Flexible(
-              child: SelectDropdown(
-                  dropdownValue: () => quizInput.gender,
-                  setter: (value) => quizInput.gender = value,
-                  labelText: config['inputGenderLabel'],
-                  dropdownOptions: config['genderDropdownOptions'])),
-          Flexible(
-              child: SubmitQuizButton(
-                  submitQuizFormKey: submitQuizFormKey,
-                  quizData: widget.quizData,
-                  quizInput: quizInput))
-        ]));
-    // return DisplayResults(quizData: widget.quizData);
+    return ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: config['cardContainerMaxWidth'],
+        ),
+        child: Form(
+            key: submitQuizFormKey,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Flexible(
+                  child: TextFormInput(
+                setter: (value) => quizInput.email = value,
+                labelText: config['inputEmailLabel'],
+                hintText: config['emailHintText'],
+                wrongInputMsg: config['incorrectInputEmailMsg'],
+                regex: config['checkEmailRegex'],
+              )),
+              Flexible(
+                  child: SelectDropdown(
+                      dropdownValue: () => quizInput.gender,
+                      setter: (value) => quizInput.gender = value,
+                      labelText: config['inputGenderLabel'],
+                      dropdownOptions: config['genderDropdownOptions'])),
+              Flexible(
+                  child: ProvideFs(
+                      childWidget: SubmitQuizButton(
+                          submitQuizFormKey: submitQuizFormKey,
+                          quizData: widget.quizData,
+                          quizInput: quizInput)))
+            ])));
   }
 }
 
@@ -130,6 +136,13 @@ class SubmitQuizButton extends StatelessWidget {
         onPressed: () {
           if (submitQuizFormKey.currentState.validate()) {
             submitQuizFormKey.currentState.save();
+            Provider.of<Fs>(context, listen: false)
+                .updateQuizResponse(quizData: quizData, quizInput: quizInput);
+            Navigator.of(context).pop();
+            showDialog(
+                context: context,
+                child:
+                    AlertDialog(content: DisplayResults(quizData: quizData)));
           }
           print(quizData.tabulateScores().outcome);
         });

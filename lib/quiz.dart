@@ -3,6 +3,7 @@ import 'dataClasses.dart';
 import 'config.dart';
 import 'package:provider/provider.dart';
 import 'forms.dart';
+import 'notifiers.dart';
 
 class Quiz extends StatefulWidget {
   final QuizInfo quizInfo;
@@ -36,9 +37,9 @@ class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
           context: context,
           alertMessage: 'Please answer all the questions before submitting');
     else
-      showDialog(
+      showDialogWithFS(
           context: context,
-          child: AlertDialog(
+          childWidget: AlertDialog(
               content: SubmitQuizForm(quizData: quizData),
               actions: [
                 FlatButton(

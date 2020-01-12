@@ -110,14 +110,13 @@ class CardContents extends StatelessWidget {
 
 void openQuiz(context, QuizInfo cardData) {
   var contextFirestore = Provider.of<Fs>(context, listen: false);
-
   Navigator.push(context, MaterialPageRoute(builder: (context) {
-    return ChangeNotifierProvider.value(
-        value: contextFirestore,
-        child: StreamProvider<List<QuizQuestion>>(
-            create: (context) => Provider.of<Fs>(context, listen: false)
-                .streamQuizQuestion(cardData.id),
-            initialData: [],
-            child: Quiz(quizInfo: cardData)));
+    return MultiProvider(providers: [
+      ChangeNotifierProvider.value(value: contextFirestore),
+      StreamProvider<List<QuizQuestion>>(
+          create: (context) => Provider.of<Fs>(context, listen: false)
+              .streamQuizQuestion(cardData.id),
+          initialData: [])
+    ], child: Quiz(quizInfo: cardData));
   }));
 }
