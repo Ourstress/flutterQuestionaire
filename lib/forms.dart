@@ -144,7 +144,6 @@ class SubmitQuizButton extends StatelessWidget {
                 child:
                     AlertDialog(content: DisplayResults(quizData: quizData)));
           }
-          print(quizData.tabulateScores().outcome);
         });
   }
 }

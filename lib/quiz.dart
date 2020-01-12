@@ -92,11 +92,14 @@ class QuestionList extends StatelessWidget {
     return ListView(
         padding: EdgeInsets.all(config['outermostPadding']),
         children: <Widget>[
-          for (QuizQuestion question in questions)
+          // list items get an index through asMap() and iterate over mapEntries to get index
+          for (MapEntry qnMapEntry in questions.asMap().entries)
             Card(
                 margin: EdgeInsets.all(config['outermostPadding']),
                 child: QuizQnTile(
-                    quizQn: question, index: 1, updateQuizScore: scoreUpdater)),
+                    quizQn: qnMapEntry.value,
+                    index: qnMapEntry.key,
+                    updateQuizScore: scoreUpdater)),
           // use Align to prevent RaisedButton from being max width https://stackoverflow.com/questions/55580066/how-can-you-reduce-the-width-of-a-raisedbutton-inside-a-listview-builder
           Align(
               child: RaisedButton(
