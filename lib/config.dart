@@ -15,6 +15,7 @@ Map config = {
   'resultTableCategoryValue': 'Score',
   // for admin controls
   'isPublicText': 'Public',
+  'viewResponsesText': 'View responses',
   'cardContainerMaxWidth': 400,
   'cardContainerMinHeight': 100,
   'wrapCardSpacing': 15,

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'notifiers.dart';
 import 'dataClasses.dart';
 import 'package:firebase/firebase.dart' as fb;
+import 'responses.dart';
 import 'secrets.dart';
 import 'quiz.dart';
 
@@ -132,10 +133,34 @@ class AdminControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider.of<Fa>(context).isAdmin == true
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[ToggleSwitch(cardData: cardData)])
+        ? Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+            OpenResponsesTile(),
+            ToggleSwitch(cardData: cardData),
+          ])
         : SizedBox();
+  }
+}
+
+class OpenResponsesTile extends StatelessWidget {
+  void openResponsesPage(BuildContext context) {
+    var contextFirestore = Provider.of<Fs>(context, listen: false);
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (BuildContext context) {
+      return ChangeNotifierProvider.value(
+          value: contextFirestore, child: ResponsesPage());
+    }));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+        leading: Icon(Icons.insert_chart),
+        title: Text(config['viewResponsesText']),
+        trailing: IconButton(
+          icon: Icon(Icons.arrow_forward),
+          onPressed: () => openResponsesPage(context),
+        ),
+        onTap: () => openResponsesPage(context));
   }
 }
 
@@ -169,7 +194,7 @@ class _ToggleSwitchState extends State<ToggleSwitch> {
           _switchState = value;
         });
       },
-      secondary: const Icon(Icons.public),
+      secondary: Icon(Icons.public),
     ));
   }
 }
