@@ -86,15 +86,19 @@ class DisplayCards extends StatelessWidget {
         child: Wrap(
           spacing: config['wrapCardSpacing'],
           runSpacing: config['wrapCardRunSpacing'],
-          children: generateCards(Provider.of<List<QuizInfo>>(context)),
+          children: generateCards(
+              context: context, quizzes: Provider.of<List<QuizInfo>>(context)),
         ));
   }
 }
 
-List<Widget> generateCards(quizzes) {
+List<Widget> generateCards({BuildContext context, List<QuizInfo> quizzes}) {
   // solve flutter flow-control-collections needed - https://stackoverflow.com/questions/59458433/flutter-flow-control-collections-are-needed-but-are-they
   return <Widget>[
-    for (QuizInfo quizData in quizzes) CardContainer(cardData: quizData)
+    for (QuizInfo quizData in quizzes)
+      Provider.of<Fa>(context).isAdmin || quizData.isPublic
+          ? CardContainer(cardData: quizData)
+          : SizedBox()
   ];
 }
 
@@ -113,36 +117,54 @@ class CardContainer extends StatelessWidget {
         child: Card(
             child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[CardContents(cardData: cardData), AdminControls()],
+          children: <Widget>[
+            CardContents(cardData: cardData),
+            AdminControls(cardData: cardData)
+          ],
         )));
   }
 }
 
 class AdminControls extends StatelessWidget {
+  final QuizInfo cardData;
+
+  const AdminControls({Key key, this.cardData}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Provider.of<Fa>(context).isAdmin == true
         ? Column(
-            mainAxisSize: MainAxisSize.min, children: <Widget>[ToggleSwitch()])
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[ToggleSwitch(cardData: cardData)])
         : SizedBox();
   }
 }
 
 class ToggleSwitch extends StatefulWidget {
+  final QuizInfo cardData;
+
+  const ToggleSwitch({Key key, this.cardData}) : super(key: key);
+
   @override
   _ToggleSwitchState createState() => _ToggleSwitchState();
 }
 
 class _ToggleSwitchState extends State<ToggleSwitch> {
-  bool _switchState = false;
+  bool _switchState;
+
+  void initState() {
+    _switchState = widget.cardData.isPublic;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Flexible(
         child: SwitchListTile(
-      title: Text('Public'),
+      title: Text(config['isPublicText']),
       value: _switchState,
       onChanged: (bool value) {
+        Provider.of<Fs>(context, listen: false)
+            .toggleQuizIsPublic(cardData: widget.cardData);
         setState(() {
           _switchState = value;
         });

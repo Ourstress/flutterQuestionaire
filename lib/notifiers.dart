@@ -51,6 +51,9 @@ class Fs with ChangeNotifier {
     };
     return quizRef().doc(quizData.quizInfo.id).update(data: updatedResponse);
   }
+
+  Future toggleQuizIsPublic({QuizInfo cardData}) =>
+      quizRef().doc(cardData.id).update(data: {'isPublic': !cardData.isPublic});
 }
 
 class ProvideFs extends StatelessWidget {

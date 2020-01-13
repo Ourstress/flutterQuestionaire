@@ -13,6 +13,8 @@ Map config = {
   // for datatable of results
   'resultTableCategoryKey': 'Category',
   'resultTableCategoryValue': 'Score',
+  // for admin controls
+  'isPublicText': 'Public',
   'cardContainerMaxWidth': 400,
   'cardContainerMinHeight': 100,
   'wrapCardSpacing': 15,
