@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
         home: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (context) => Fs()),
+              ChangeNotifierProvider(create: (context) => Fa()),
             ],
             // reference for streamProvider https://github.com/fireship-io/185-advanced-flutter-firestore/blob/master/lib/main.dart
             child: StreamProvider<List<QuizInfo>>(
@@ -48,9 +49,31 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(config['appName']),
-      ),
+          title: Text(config['appName']),
+          actions: <Widget>[AdminSignInButton()]),
       body: DisplayCards(),
+    );
+  }
+}
+
+class AdminSignInButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      child: Text(
+        'Site\n Admin',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white),
+      ),
+      onPressed: () async {
+        fb.Auth fbAuth = Provider.of<Fa>(context, listen: false).fbAuth;
+        var provider = fb.GoogleAuthProvider();
+        try {
+          await fbAuth.signInWithPopup(provider);
+        } catch (e) {
+          print("Error in sign in with google: $e");
+        }
+      },
     );
   }
 }
