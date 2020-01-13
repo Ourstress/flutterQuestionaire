@@ -8,21 +8,24 @@ import 'package:provider/provider.dart';
 class Fa with ChangeNotifier {
   fb.Auth fbAuth = fb.auth();
   fb.User user;
+  bool isAdmin = false;
 
   Fa() {
     fbAuth.onAuthStateChanged.listen((e) {
       user = e;
+      adminUserCheck(user);
       notifyListeners();
     });
   }
+
+  adminUserCheck(user) => isAdmin = user != null ? true : false;
 }
 
 class Fs with ChangeNotifier {
   Firestore store = fb.firestore();
-  Firestore get getStore => store;
 
-  CollectionReference quizRef() => getStore.collection('quiz');
-  CollectionReference quizQnRef() => getStore.collection('questions');
+  CollectionReference quizRef() => store.collection('quiz');
+  CollectionReference quizQnRef() => store.collection('questions');
 
   Stream<List<QuizInfo>> streamQuizzes() => quizRef().onSnapshot.map(
       (list) => list.docs.map((doc) => QuizInfo.fromFirestore(doc)).toList());

@@ -129,6 +129,7 @@ class QuizInfo {
   final String instructions;
   final String resultsExplanation;
   final ResponseList responseList;
+  final bool isPublic;
 
   QuizInfo(
       {this.id,
@@ -136,7 +137,8 @@ class QuizInfo {
       this.desc,
       this.instructions,
       this.resultsExplanation,
-      this.responseList});
+      this.responseList,
+      this.isPublic});
 
   factory QuizInfo.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data();
@@ -147,7 +149,8 @@ class QuizInfo {
         desc: data['desc'] ?? '',
         instructions: data['instructions'] ?? '',
         resultsExplanation: data['resultsExplanation'] ?? '',
-        responseList: ResponseList.fromFirestore(data['responseList']));
+        responseList: ResponseList.fromFirestore(data['responseList']) ?? [],
+        isPublic: data['isPublic'] ?? false);
   }
 }
 

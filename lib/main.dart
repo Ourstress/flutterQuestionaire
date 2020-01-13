@@ -111,9 +111,44 @@ class CardContainer extends StatelessWidget {
             maxWidth: config['cardContainerMaxWidth'],
             minHeight: config['cardContainerMinHeight']),
         child: Card(
-            child: Row(
-          children: <Widget>[CardContents(cardData: cardData)],
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[CardContents(cardData: cardData), AdminControls()],
         )));
+  }
+}
+
+class AdminControls extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Provider.of<Fa>(context).isAdmin == true
+        ? Column(
+            mainAxisSize: MainAxisSize.min, children: <Widget>[ToggleSwitch()])
+        : SizedBox();
+  }
+}
+
+class ToggleSwitch extends StatefulWidget {
+  @override
+  _ToggleSwitchState createState() => _ToggleSwitchState();
+}
+
+class _ToggleSwitchState extends State<ToggleSwitch> {
+  bool _switchState = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+        child: SwitchListTile(
+      title: Text('Public'),
+      value: _switchState,
+      onChanged: (bool value) {
+        setState(() {
+          _switchState = value;
+        });
+      },
+      secondary: const Icon(Icons.public),
+    ));
   }
 }
 
@@ -123,7 +158,7 @@ class CardContents extends StatelessWidget {
   const CardContents({Key key, this.cardData}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return Flexible(
         child: ListTile(
       title: Text(cardData.title),
       onTap: () => openQuiz(context, cardData),
