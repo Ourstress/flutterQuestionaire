@@ -1,5 +1,11 @@
 import 'package:firebase/firestore.dart';
 
+class SelectedChartSettings {
+  String gender = 'all';
+  String semester = 'all';
+  String measure = 'count';
+}
+
 class QuizSubmitDataInput {
   String email = '';
   String gender = 'female';

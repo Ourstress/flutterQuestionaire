@@ -40,7 +40,9 @@ class SubmitQuizFormState extends State<SubmitQuizForm> {
               Flexible(
                   child: SelectDropdown(
                       dropdownValue: () => quizInput.gender,
-                      setter: (value) => quizInput.gender = value,
+                      setter: (value) => setState(() {
+                            quizInput.gender = value;
+                          }),
                       labelText: config['inputGenderLabel'],
                       dropdownOptions: config['genderDropdownOptions'])),
               Flexible(
@@ -105,8 +107,8 @@ class SelectDropdown extends StatelessWidget {
     return DropdownButtonFormField<String>(
       value: dropdownValue(),
       decoration: InputDecoration(
-        labelText: labelText,
-      ),
+          labelText: labelText,
+          labelStyle: TextStyle(fontSize: config['normalFontSize'])),
       isExpanded: true,
       icon: Icon(Icons.arrow_downward),
       iconSize: 24,

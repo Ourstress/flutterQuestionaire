@@ -15,6 +15,13 @@ Map config = {
   // for admin controls
   'isPublicText': 'Public',
   'viewResponsesText': 'View responses',
+  // for response chart settings
+  'genderLabel': 'Gender',
+  'semesterLabel': 'Semester',
+  'measureLabel': 'Measure',
+  'wrapSpacing': 20.0,
+  'dropdownWidth': 100,
+  'measureOptions': ['average score', 'count'],
   'cardContainerMaxWidth': 400,
   'cardContainerMinHeight': 100,
   'wrapCardSpacing': 15,
@@ -22,5 +29,5 @@ Map config = {
   'outermostPadding': 12,
   'emphasisTextPadding': 25,
   'quizResultsFontSize': 25,
-  'normalFontSize': 18
+  'normalFontSize': 20
 };

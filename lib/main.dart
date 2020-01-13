@@ -132,7 +132,7 @@ class AdminControls extends StatelessWidget {
   const AdminControls({Key key, this.cardData}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Provider.of<Fa>(context).isAdmin == true
+    return Provider.of<Fa>(context).isAdmin
         ? Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
             OpenResponsesTile(),
             ToggleSwitch(cardData: cardData),
