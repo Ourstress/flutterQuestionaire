@@ -27,7 +27,8 @@ class SubmitQuizFormState extends State<SubmitQuizForm> {
         ),
         child: Form(
             key: submitQuizFormKey,
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
+            child: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
               Flexible(
                   child: TextFormInput(
                 setter: (value) => quizInput.email = value,
@@ -48,7 +49,7 @@ class SubmitQuizFormState extends State<SubmitQuizForm> {
                           submitQuizFormKey: submitQuizFormKey,
                           quizData: widget.quizData,
                           quizInput: quizInput)))
-            ])));
+            ]))));
   }
 }
 
@@ -72,7 +73,8 @@ class TextFormInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       onSaved: (String value) => setter(value),
-      decoration: InputDecoration(labelText: labelText, hintText: hintText),
+      decoration: InputDecoration(
+          labelText: labelText, hintText: hintText, errorMaxLines: 2),
       validator: (value) {
         RegExp pattern = RegExp(regex);
         if (value.isEmpty || !pattern.hasMatch(value)) {

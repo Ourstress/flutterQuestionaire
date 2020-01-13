@@ -8,8 +8,7 @@ Map config = {
   'inputEmailLabel': 'Please enter an NUS email.',
   'checkEmailRegex': r"e\d{7}@u.nus.edu$",
   'emailHintText': 'eXXXXXXX@u.nus.edu',
-  'incorrectInputEmailMsg':
-      'Please enter a valid NUS email address like eXXXXXXX@u.nus.edu',
+  'incorrectInputEmailMsg': 'Enter something like eXXXXXXX@u.nus.edu',
   // for datatable of results
   'resultTableCategoryKey': 'Category',
   'resultTableCategoryValue': 'Score',
