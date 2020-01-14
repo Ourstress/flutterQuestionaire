@@ -17,8 +17,7 @@ class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
   QuizData quizData;
 
   void initState() {
-    quizData = QuizData(
-        collatedScores: {}, questionScores: {}, quizInfo: widget.quizInfo);
+    quizData = QuizData(collatedScores: {}, quizInfo: widget.quizInfo);
     super.initState();
   }
 
@@ -28,11 +27,10 @@ class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
       quizData.collatedScores[question]['type'] = questionType;
     }
     quizData.collatedScores[question]['score'] = value;
-    quizData.questionScores[question] = value;
   }
 
   void onSubmit(questions) {
-    if (quizData.questionScores.length != questions.length)
+    if (quizData.collatedScores.length != questions.length)
       showAlert(
           context: context,
           alertMessage: 'Please answer all the questions before submitting');

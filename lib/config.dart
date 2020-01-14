@@ -9,7 +9,8 @@ Map config = {
   'checkEmailRegex': r"e\d{7}@u.nus.edu$",
   'emailHintText': 'eXXXXXXX@u.nus.edu',
   'incorrectInputEmailMsg': 'Enter something like eXXXXXXX@u.nus.edu',
-  // for datatable of results
+  // for display of results
+  'recordedResponseText': 'Your response has been recorded!',
   'resultTableCategoryKey': 'Category',
   'resultTableCategoryValue': 'Score',
   // for admin controls
@@ -20,7 +21,7 @@ Map config = {
   'semesterLabel': 'Semester',
   'measureLabel': 'Measure',
   'wrapSpacing': 20.0,
-  'dropdownWidth': 100,
+  'dropdownWidth': 150,
   'measureOptions': ['average score', 'count'],
   'cardContainerMaxWidth': 400,
   'cardContainerMinHeight': 100,

@@ -10,6 +10,7 @@ dependencies:
     sdk: flutter
   provider: ^4.0.1
   firebase: ^7.1.0
+  queries: ^0.1.14
 
 dev_dependencies:
   flutter_test:

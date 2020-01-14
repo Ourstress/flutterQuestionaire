@@ -165,15 +165,23 @@ class DisplayResults extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ResultDisplayText(
+            displayText: config['recordedResponseText'],
+            padding: config['outermostPadding'],
+            fontWeight: FontWeight.w300,
+            fontSize: config['normalFontSize']),
+        ResultDisplayText(
             displayText: _quizDataInfo.title,
             padding: config['outermostPadding'],
             fontWeight: FontWeight.w600,
             fontSize: config['normalFontSize']),
-        ResultDisplayText(
-            displayText: _quizScores.outcome,
-            padding: config['emphasisTextPadding'],
-            fontWeight: FontWeight.w700,
-            fontSize: config['quizResultsFontSize']),
+        // check if string is numeric to don't display table if results is just a numeric score https://stackoverflow.com/questions/24085385/checking-if-string-is-numeric-in-dart
+        num.tryParse(_quizScores.outcome) != null
+            ? SizedBox()
+            : ResultDisplayText(
+                displayText: _quizScores.outcome,
+                padding: config['emphasisTextPadding'],
+                fontWeight: FontWeight.w700,
+                fontSize: config['quizResultsFontSize']),
         ResultDisplayText(
             // use .replaceAll("\\n", "\n") to show line breaks denoted by \n in Firebase
             displayText:
@@ -181,29 +189,34 @@ class DisplayResults extends StatelessWidget {
             padding: config['outermostPadding'],
             fontWeight: FontWeight.w300,
             fontSize: config['normalFontSize']),
-        ResultDisplayText(
-            displayText: 'Your Scores',
-            padding: config['outermostPadding'],
-            fontWeight: FontWeight.w600,
-            fontSize: config['normalFontSize']),
-        DataTable(
-          columns: [
-            DataColumn(
-                label: DataTableText(
-                    displayText: config['resultTableCategoryKey'])),
-            DataColumn(
-                label: DataTableText(
-                    displayText: config['resultTableCategoryValue'])),
-          ],
-          rows: [
-            for (MapEntry scoresMapEntry in _quizScores.tabulatedScores.entries)
-              DataRow(cells: [
-                DataCell(DataTableText(displayText: scoresMapEntry.key)),
-                DataCell(
-                    DataTableText(displayText: scoresMapEntry.value.toString()))
-              ])
-          ],
-        )
+        num.tryParse(_quizScores.outcome) != null
+            ? SizedBox()
+            : ResultDisplayText(
+                displayText: 'Your Scores',
+                padding: config['outermostPadding'],
+                fontWeight: FontWeight.w600,
+                fontSize: config['normalFontSize']),
+        num.tryParse(_quizScores.outcome) != null
+            ? SizedBox()
+            : DataTable(
+                columns: [
+                  DataColumn(
+                      label: DataTableText(
+                          displayText: config['resultTableCategoryKey'])),
+                  DataColumn(
+                      label: DataTableText(
+                          displayText: config['resultTableCategoryValue'])),
+                ],
+                rows: [
+                  for (MapEntry scoresMapEntry
+                      in _quizScores.tabulatedScores.entries)
+                    DataRow(cells: [
+                      DataCell(DataTableText(displayText: scoresMapEntry.key)),
+                      DataCell(DataTableText(
+                          displayText: scoresMapEntry.value.toString()))
+                    ])
+                ],
+              )
       ],
     );
   }

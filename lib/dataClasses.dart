@@ -1,4 +1,13 @@
 import 'package:firebase/firestore.dart';
+import 'package:queries/collections.dart';
+
+class ChartLogic {
+  final QuizInfo quizInfo;
+
+  ChartLogic({this.quizInfo});
+
+  ResponseList get getResponses => quizInfo.responseList;
+}
 
 class SelectedChartSettings {
   String gender = 'all';
@@ -13,10 +22,9 @@ class QuizSubmitDataInput {
 
 class QuizData extends QuizLogic {
   final Map collatedScores;
-  final Map questionScores;
   final QuizInfo quizInfo;
 
-  QuizData({this.collatedScores, this.questionScores, this.quizInfo})
+  QuizData({this.collatedScores, this.quizInfo})
       : super(collatedScores: collatedScores);
 }
 
@@ -37,6 +45,14 @@ class QuizLogic {
   }
 
   String _findOutcome({Map tabulatedScores}) {
+    if (tabulatedScores.containsKey('totalScore') &&
+        tabulatedScores.length == 1)
+      return tabulatedScores.values.first.toString();
+    else
+      return _findOutcomeByType(tabulatedScores: tabulatedScores);
+  }
+
+  String _findOutcomeByType({Map tabulatedScores}) {
     int _highestScore = 0;
     String _outcome = '';
     for (String outcomeType in tabulatedScores.keys) {
@@ -51,6 +67,24 @@ class QuizLogic {
   }
 
   Map _addScores({List<QuizQnScore> scores}) {
+    var scoreCollection = Collection(<QuizQnScore>[...scores]);
+    var scoreTypeFilter =
+        scoreCollection.where((score) => score.type != '').toList();
+
+    // below we check if all the questions in a quiz don't have specified type
+    if (scoreTypeFilter.isEmpty)
+      return _tabulateScoresWithoutType(scores: scores);
+    else
+      return _tabulateScoresByType(scores: scores);
+  }
+
+  Map _tabulateScoresWithoutType({List<QuizQnScore> scores}) {
+    double totalScore = 0;
+    scores.forEach((quizQnScore) => totalScore += quizQnScore.score);
+    return {'totalScore': totalScore};
+  }
+
+  Map _tabulateScoresByType({List<QuizQnScore> scores}) {
     Map tabulatedScores = {};
     scores.forEach((quizQnScore) {
       if (!tabulatedScores.containsKey(quizQnScore.type)) {
@@ -183,11 +217,11 @@ class Response {
 
   factory Response.fromFirestore(MapEntry responseMapEntry) {
     return Response(
-        createdAt: responseMapEntry.value['createdAt'] ?? '',
+        createdAt: responseMapEntry.value['createdAt'] ?? DateTime.now(),
         gender: responseMapEntry.value['gender'] ?? '',
         email: responseMapEntry.key ?? '',
-        results:
-            Results.fromFirestore(responseMapEntry.value['results']) ?? '');
+        results: Results.fromFirestore(responseMapEntry.value['results']) ??
+            Results(outcome: '', collatedScores: {}, questionScores: {}));
   }
 }
 
