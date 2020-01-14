@@ -161,6 +161,8 @@ class DisplayResults extends StatelessWidget {
   Widget build(BuildContext context) {
     QuizInfo _quizDataInfo = quizData.quizInfo;
     TabulatedScore _quizScores = quizData.tabulateScores();
+    // check if string is numeric to don't display table if results is just a numeric score https://stackoverflow.com/questions/24085385/checking-if-string-is-numeric-in-dart
+    bool quizOutcomeIsNumeric() => num.tryParse(_quizScores.outcome) != null;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -174,8 +176,7 @@ class DisplayResults extends StatelessWidget {
             padding: config['outermostPadding'],
             fontWeight: FontWeight.w600,
             fontSize: config['normalFontSize']),
-        // check if string is numeric to don't display table if results is just a numeric score https://stackoverflow.com/questions/24085385/checking-if-string-is-numeric-in-dart
-        num.tryParse(_quizScores.outcome) != null
+        quizOutcomeIsNumeric()
             ? SizedBox()
             : ResultDisplayText(
                 displayText: _quizScores.outcome,
@@ -189,14 +190,14 @@ class DisplayResults extends StatelessWidget {
             padding: config['outermostPadding'],
             fontWeight: FontWeight.w300,
             fontSize: config['normalFontSize']),
-        num.tryParse(_quizScores.outcome) != null
+        quizOutcomeIsNumeric()
             ? SizedBox()
             : ResultDisplayText(
                 displayText: 'Your Scores',
                 padding: config['outermostPadding'],
                 fontWeight: FontWeight.w600,
                 fontSize: config['normalFontSize']),
-        num.tryParse(_quizScores.outcome) != null
+        quizOutcomeIsNumeric()
             ? SizedBox()
             : DataTable(
                 columns: [

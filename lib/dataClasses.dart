@@ -6,7 +6,43 @@ class ChartLogic {
 
   ChartLogic({this.quizInfo});
 
-  ResponseList get getResponses => quizInfo.responseList;
+  Collection<Response> responseCollection() =>
+      Collection(<Response>[...quizInfo.responseList.responses]);
+
+  Map<String, List<Response>> groupByAttribute(query) {
+    var result = <String, List<Response>>{};
+    for (var group in query.asIterable()) {
+      result[group.key] = <Response>[];
+      for (var child in group.asIterable()) {
+        result[group.key].add(child);
+      }
+    }
+    return result;
+  }
+
+  Map<String, List<Response>> groupByGender() {
+    var query = responseCollection().groupBy((response) => response.gender);
+    return groupByAttribute(query);
+  }
+
+  Map<String, List<Response>> groupByOutcome() {
+    var query =
+        responseCollection().groupBy((response) => response.results.outcome);
+    return groupByAttribute(query);
+  }
+
+  List<ChartCoordinates> chartCoordsByOutcome() => groupByOutcome()
+      .entries
+      .map((entry) =>
+          ChartCoordinates(label: entry.key, number: entry.value.length))
+      .toList();
+}
+
+class ChartCoordinates {
+  final String label;
+  final int number;
+
+  ChartCoordinates({this.label, this.number});
 }
 
 class SelectedChartSettings {

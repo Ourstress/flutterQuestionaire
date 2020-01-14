@@ -41,8 +41,8 @@ class Fs with ChangeNotifier {
     Map<String, dynamic> updatedResponse = {
       'responseList.${quizInput.email.replaceAll('.', '%2E')}': {
         'results': {
-          'collatedScores': quizData.collatedScores,
-          'questionScores': quizData.questionScores,
+          'collatedScores': quizData.tabulateScores().tabulatedScores,
+          'questionScores': quizData.collatedScores,
           'outcome': quizData.tabulateScores().outcome
         },
         'gender': quizInput.gender,

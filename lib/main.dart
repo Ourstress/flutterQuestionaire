@@ -134,7 +134,7 @@ class AdminControls extends StatelessWidget {
   Widget build(BuildContext context) {
     return Provider.of<Fa>(context).isAdmin
         ? Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            OpenResponsesTile(),
+            OpenResponsesTile(cardData: cardData),
             ToggleSwitch(cardData: cardData),
           ])
         : SizedBox();
@@ -142,12 +142,16 @@ class AdminControls extends StatelessWidget {
 }
 
 class OpenResponsesTile extends StatelessWidget {
+  final QuizInfo cardData;
+
+  const OpenResponsesTile({Key key, this.cardData}) : super(key: key);
+
   void openResponsesPage(BuildContext context) {
     var contextFirestore = Provider.of<Fs>(context, listen: false);
     Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (BuildContext context) {
       return ChangeNotifierProvider.value(
-          value: contextFirestore, child: ResponsesPage());
+          value: contextFirestore, child: ResponsesPage(quizInfo: cardData));
     }));
   }
 

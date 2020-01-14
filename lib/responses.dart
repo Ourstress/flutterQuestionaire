@@ -2,15 +2,31 @@ import 'package:flutter/material.dart';
 import 'forms.dart';
 import 'config.dart';
 import 'dataClasses.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class ResponsesPage extends StatelessWidget {
+  final QuizInfo quizInfo;
+
+  const ResponsesPage({Key key, this.quizInfo}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    ChartLogic chartLogic = ChartLogic(quizInfo: quizInfo);
+
     return Scaffold(
         appBar: AppBar(title: Text('Responses')),
-        body: SingleChildScrollView(
+        body: Padding(
             padding: EdgeInsets.all(config['outermostPadding']),
-            child: ResponseChartSettings()));
+            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              // FlatButton is temporarily here
+              FlatButton(
+                  child: Text('hello'),
+                  onPressed: () {
+                    print(chartLogic.groupByOutcome());
+                  }),
+              ResponseChartSettings(),
+              ChartDisplay(coords: chartLogic.chartCoordsByOutcome())
+            ])));
   }
 }
 
@@ -60,4 +76,34 @@ class _ResponseChartSettingsState extends State<ResponseChartSettings> {
                   dropdownOptions: config['measureOptions']))
         ]);
   }
+}
+
+class ChartDisplay extends StatelessWidget {
+  final List<ChartCoordinates> coords;
+
+  const ChartDisplay({Key key, this.coords}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child: charts.BarChart(
+      _chartCoordinatesList(coords: coords),
+      animate: false,
+    ));
+  }
+}
+
+List<charts.Series<ChartCoordinates, String>> _chartCoordinatesList(
+    {List<ChartCoordinates> coords}) {
+  final data = coords;
+
+  return [
+    new charts.Series<ChartCoordinates, String>(
+      id: 'types',
+      colorFn: (_, __) => charts.MaterialPalette.teal.shadeDefault,
+      domainFn: (ChartCoordinates coordinate, _) => coordinate.label,
+      measureFn: (ChartCoordinates coordinate, _) => coordinate.number,
+      data: data,
+    )
+  ];
 }
