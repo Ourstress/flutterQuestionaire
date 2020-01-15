@@ -16,6 +16,8 @@ Map config = {
   // for admin controls
   'isPublicText': 'Public',
   'viewResponsesText': 'View responses',
+  // for handling quiz without types
+  'no-type-quiz-identifier': 'Submitted',
   // for response chart settings
   'genderLabel': 'Gender',
   'semesterLabel': 'Semester',

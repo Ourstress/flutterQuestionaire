@@ -1,5 +1,6 @@
 import 'package:firebase/firestore.dart';
 import 'package:queries/collections.dart';
+import 'config.dart';
 
 class ChartLogic {
   final QuizInfo quizInfo;
@@ -83,7 +84,7 @@ class QuizLogic {
   String _findOutcome({Map tabulatedScores}) {
     if (tabulatedScores.containsKey('totalScore') &&
         tabulatedScores.length == 1)
-      return tabulatedScores.values.first.toString();
+      return config['no-type-quiz-identifier'];
     else
       return _findOutcomeByType(tabulatedScores: tabulatedScores);
   }
@@ -117,7 +118,7 @@ class QuizLogic {
   Map _tabulateScoresWithoutType({List<QuizQnScore> scores}) {
     double totalScore = 0;
     scores.forEach((quizQnScore) => totalScore += quizQnScore.score);
-    return {'totalScore': totalScore};
+    return {config['no-type-quiz-identifier']: totalScore};
   }
 
   Map _tabulateScoresByType({List<QuizQnScore> scores}) {
