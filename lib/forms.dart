@@ -4,6 +4,7 @@ import 'dataClasses.dart';
 import 'config.dart';
 import 'package:provider/provider.dart';
 import 'notifiers.dart';
+import 'dart:convert';
 
 class SubmitQuizForm extends StatefulWidget {
   final QuizData quizData;
@@ -137,11 +138,20 @@ class SubmitQuizButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return RaisedButton(
         child: Text('Submit'),
-        onPressed: () {
+        onPressed: () async {
           if (submitQuizFormKey.currentState.validate()) {
             submitQuizFormKey.currentState.save();
             Provider.of<Fs>(context, listen: false)
                 .updateQuizResponse(quizData: quizData, quizInput: quizInput);
+            // using json.encode https://stackoverflow.com/questions/54849725/bad-state-cannot-set-the-body-fields-of-a-request-with-content-type-applicatio
+            String bodyContents =
+                json.encode({...quizData.toJson(), "email": quizInput.email});
+            await http.post(
+                'https://dmj12kht6c.execute-api.us-east-1.amazonaws.com/Prod/',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: bodyContents);
             Navigator.of(context).pop();
             showDialog(
                 context: context,
@@ -161,8 +171,6 @@ class DisplayResults extends StatelessWidget {
   Widget build(BuildContext context) {
     QuizInfo _quizDataInfo = quizData.quizInfo;
     TabulatedScore _quizScores = quizData.tabulateScores();
-    // check if string is numeric to don't display table if results is just a numeric score https://stackoverflow.com/questions/24085385/checking-if-string-is-numeric-in-dart
-    // bool quizOutcomeIsNumeric() => num.tryParse(_quizScores.outcome) != null;
     bool quizNoType() =>
         _quizScores.outcome == config['no-type-quiz-identifier'];
     return Column(

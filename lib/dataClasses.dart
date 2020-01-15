@@ -63,6 +63,12 @@ class QuizData extends QuizLogic {
 
   QuizData({this.collatedScores, this.quizInfo})
       : super(collatedScores: collatedScores);
+
+  Map<String, dynamic> toJson() => {
+        'quizName': quizInfo.title,
+        'quizOutcome': tabulateScores().outcome,
+        'quizResults': tabulateScores().tabulatedScores
+      };
 }
 
 class QuizLogic {
