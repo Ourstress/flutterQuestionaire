@@ -15,10 +15,24 @@ class ResponsesPage extends StatefulWidget {
 
 class _ResponsesPageState extends State<ResponsesPage> {
   ChartLogic chartLogic;
+  List<charts.Series<ChartCoordinates, String>> _chartData;
 
   void initState() {
     chartLogic = ChartLogic(quizInfo: widget.quizInfo);
+    _chartData = chartLogic.createChartData(
+        data: chartLogic.toggleChartSettings(setting: 'all'),
+        context: context,
+        selectedMeasure: 'count');
     super.initState();
+  }
+
+  void changeChartDisplay({String setting = 'all', String measure = 'count'}) {
+    setState(() {
+      _chartData = chartLogic.createChartData(
+          data: chartLogic.toggleChartSettings(setting: setting),
+          context: context,
+          selectedMeasure: measure);
+    });
   }
 
   @override
@@ -32,25 +46,29 @@ class _ResponsesPageState extends State<ResponsesPage> {
               FlatButton(
                   child: Text('hello'),
                   onPressed: () {
-                    print(chartLogic.toggleChartSettings(setting: 'gender'));
+                    changeChartDisplay(setting: 'gender');
                   }),
-              ResponseChartSettings(),
-              ChartDisplay(
-                  coords: chartLogic.createChartData(
-                      data: chartLogic.toggleChartSettings(setting: 'gender'),
-                      context: context,
-                      selectedMeasure: 'count'))
+              ResponseChartSettings(changeChartDisplay: changeChartDisplay),
+              ChartDisplay(coords: _chartData)
             ])));
   }
 }
 
 class ResponseChartSettings extends StatefulWidget {
+  final Function changeChartDisplay;
+
+  const ResponseChartSettings({Key key, this.changeChartDisplay})
+      : super(key: key);
+
   @override
   _ResponseChartSettingsState createState() => _ResponseChartSettingsState();
 }
 
 class _ResponseChartSettingsState extends State<ResponseChartSettings> {
   SelectedChartSettings selectedSettings = SelectedChartSettings();
+
+  void updateChartDisplay() => widget.changeChartDisplay(
+      setting: selectedSettings.gender, measure: selectedSettings.measure);
 
   @override
   Widget build(BuildContext context) {
@@ -62,14 +80,14 @@ class _ResponseChartSettingsState extends State<ResponseChartSettings> {
               width: config['dropdownWidth'],
               child: SelectDropdown(
                   dropdownValue: () => selectedSettings.gender,
-                  setter: (value) => setState(() {
-                        selectedSettings.gender = value;
-                      }),
+                  setter: (value) {
+                    setState(() {
+                      selectedSettings.gender = value;
+                    });
+                    updateChartDisplay();
+                  },
                   labelText: config['genderLabel'],
-                  dropdownOptions: [
-                    ...config['genderDropdownOptions'],
-                    'all'
-                  ])),
+                  dropdownOptions: config['genderOptions'])),
           SizedBox(
               width: config['dropdownWidth'],
               child: SelectDropdown(
@@ -83,9 +101,12 @@ class _ResponseChartSettingsState extends State<ResponseChartSettings> {
               width: config['dropdownWidth'],
               child: SelectDropdown(
                   dropdownValue: () => selectedSettings.measure,
-                  setter: (value) => setState(() {
-                        selectedSettings.measure = value;
-                      }),
+                  setter: (value) {
+                    setState(() {
+                      selectedSettings.measure = value;
+                    });
+                    updateChartDisplay();
+                  },
                   labelText: config['measureLabel'],
                   dropdownOptions: config['measureOptions']))
         ]);

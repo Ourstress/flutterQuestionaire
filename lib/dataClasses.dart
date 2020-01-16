@@ -32,35 +32,57 @@ class ChartLogic {
     return groupByAttribute(query);
   }
 
-  List<ChartCoordinates> chartCoordsByOutcome({Collection collection}) =>
-      groupbyToCoords(groupbyResult: groupByOutcome(collection));
+  Map<String, List<ChartCoordinates>> chartCoordsByOutcome(
+          {Collection collection}) =>
+      {
+        'outcomes':
+            groupbySingleToCoords(groupbyResult: groupByOutcome(collection))
+      };
 
-  List<ChartCoordinates> groupbyToCoords(
-          {Map<String, List<Response>> groupbyResult, String outcome}) =>
-      groupbyResult.entries
-          .map((entry) => ChartCoordinates(label: entry.key, values: {
-                'count': entry.value.length,
-                'average': sumUpResponseValues(entry.value, outcome) /
-                    entry.value.length
-              }))
-          .toList();
+  List<ChartCoordinates> groupbySingleToCoords(
+      {Map<String, List<Response>> groupbyResult}) {
+    return groupbyResult.entries.map((entry) {
+      return ChartCoordinates(label: entry.key, values: {
+        'count': entry.value.length,
+        'average':
+            sumUpResponseValues(entry.value, entry.key) / entry.value.length
+      });
+    }).toList();
+  }
+
+  List<ChartCoordinates> groupbyDoubleToCoords(
+      {Map<String, List<Response>> groupbyResult, String outcome}) {
+    return groupbyResult.entries.map((entry) {
+      return ChartCoordinates(label: entry.key, values: {
+        'count': entry.value.length,
+        'average':
+            sumUpResponseValues(entry.value, outcome) / entry.value.length
+      });
+    }).toList();
+  }
 
   int sumUpResponseValues(List<Response> responseList, String type) =>
       Collection(<Response>[...responseList]).aggregate$1(0, (r, e) {
-        if (e.results.collatedScores.containsKey(type))
-          return r + e.results.collatedScores[type];
+        Map keysToLowercase(Map mapForConversion) =>
+            Map.fromEntries(mapForConversion.entries.map(
+                (entry) => MapEntry(entry.key.toLowerCase(), entry.value)));
+        Map scoresLowercase = keysToLowercase(e.results.collatedScores);
+        if (scoresLowercase.containsKey(type.toLowerCase()))
+          return r + scoresLowercase[type.toLowerCase()];
         else
           return r + 0;
       });
 
-  Map chartCoordsByOutcomeGender({Collection collection}) {
-    Map chartsList = {};
+  Map<String, List<ChartCoordinates>> chartCoordsByOutcomeGender(
+      {Collection collection}) {
+    Map<String, List<ChartCoordinates>> chartsList = {};
     Map outcomesByGender = groupByOutcome(collection).map((key, value) {
       return MapEntry(key, groupByGender(Collection(<Response>[...value])));
     });
-    outcomesByGender.forEach((outcome, responsesByGender) =>
-        chartsList[outcome] =
-            groupbyToCoords(groupbyResult: responsesByGender));
+    outcomesByGender.forEach((outcome, responsesByGender) {
+      chartsList[outcome] = groupbyDoubleToCoords(
+          groupbyResult: responsesByGender, outcome: outcome);
+    });
     return chartsList;
   }
 
@@ -80,7 +102,7 @@ class ChartLogic {
     return chartData;
   }
 
-  dynamic toggleChartSettings({String setting}) {
+  Map<String, List<ChartCoordinates>> toggleChartSettings({String setting}) {
     if (setting == 'gender')
       return chartCoordsByOutcomeGender(collection: _responseCollection());
     else
