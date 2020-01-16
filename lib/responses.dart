@@ -4,15 +4,25 @@ import 'config.dart';
 import 'dataClasses.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-class ResponsesPage extends StatelessWidget {
+class ResponsesPage extends StatefulWidget {
   final QuizInfo quizInfo;
 
   const ResponsesPage({Key key, this.quizInfo}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    ChartLogic chartLogic = ChartLogic(quizInfo: quizInfo);
+  _ResponsesPageState createState() => _ResponsesPageState();
+}
 
+class _ResponsesPageState extends State<ResponsesPage> {
+  ChartLogic chartLogic;
+
+  void initState() {
+    chartLogic = ChartLogic(quizInfo: widget.quizInfo);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text('Responses')),
         body: Padding(
@@ -22,10 +32,14 @@ class ResponsesPage extends StatelessWidget {
               FlatButton(
                   child: Text('hello'),
                   onPressed: () {
-                    print(chartLogic.groupByOutcome());
+                    print(chartLogic.toggleChartSettings(setting: 'gender'));
                   }),
               ResponseChartSettings(),
-              ChartDisplay(coords: chartLogic.chartCoordsByOutcome())
+              ChartDisplay(
+                  coords: chartLogic.createChartData(
+                      data: chartLogic.toggleChartSettings(setting: 'gender'),
+                      context: context,
+                      selectedMeasure: 'count'))
             ])));
   }
 }
@@ -79,7 +93,7 @@ class _ResponseChartSettingsState extends State<ResponseChartSettings> {
 }
 
 class ChartDisplay extends StatelessWidget {
-  final List<ChartCoordinates> coords;
+  final List<charts.Series<ChartCoordinates, String>> coords;
 
   const ChartDisplay({Key key, this.coords}) : super(key: key);
 
@@ -87,23 +101,8 @@ class ChartDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
         child: charts.BarChart(
-      _chartCoordinatesList(coords: coords),
+      coords,
       animate: false,
     ));
   }
-}
-
-List<charts.Series<ChartCoordinates, String>> _chartCoordinatesList(
-    {List<ChartCoordinates> coords}) {
-  final data = coords;
-
-  return [
-    new charts.Series<ChartCoordinates, String>(
-      id: 'types',
-      colorFn: (_, __) => charts.MaterialPalette.teal.shadeDefault,
-      domainFn: (ChartCoordinates coordinate, _) => coordinate.label,
-      measureFn: (ChartCoordinates coordinate, _) => coordinate.number,
-      data: data,
-    )
-  ];
 }

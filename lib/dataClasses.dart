@@ -1,13 +1,14 @@
 import 'package:firebase/firestore.dart';
 import 'package:queries/collections.dart';
 import 'config.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class ChartLogic {
   final QuizInfo quizInfo;
 
   ChartLogic({this.quizInfo});
 
-  Collection<Response> responseCollection() =>
+  Collection<Response> _responseCollection() =>
       Collection(<Response>[...quizInfo.responseList.responses]);
 
   Map<String, List<Response>> groupByAttribute(query) {
@@ -21,29 +22,77 @@ class ChartLogic {
     return result;
   }
 
-  Map<String, List<Response>> groupByGender() {
-    var query = responseCollection().groupBy((response) => response.gender);
+  Map<String, List<Response>> groupByGender(Collection collection) {
+    var query = collection.groupBy((response) => response.gender);
     return groupByAttribute(query);
   }
 
-  Map<String, List<Response>> groupByOutcome() {
-    var query =
-        responseCollection().groupBy((response) => response.results.outcome);
+  Map<String, List<Response>> groupByOutcome(Collection collection) {
+    var query = collection.groupBy((response) => response.results.outcome);
     return groupByAttribute(query);
   }
 
-  List<ChartCoordinates> chartCoordsByOutcome() => groupByOutcome()
-      .entries
-      .map((entry) =>
-          ChartCoordinates(label: entry.key, number: entry.value.length))
-      .toList();
+  List<ChartCoordinates> chartCoordsByOutcome({Collection collection}) =>
+      groupbyToCoords(groupbyResult: groupByOutcome(collection));
+
+  List<ChartCoordinates> groupbyToCoords(
+          {Map<String, List<Response>> groupbyResult, String outcome}) =>
+      groupbyResult.entries
+          .map((entry) => ChartCoordinates(label: entry.key, values: {
+                'count': entry.value.length,
+                'average': sumUpResponseValues(entry.value, outcome) /
+                    entry.value.length
+              }))
+          .toList();
+
+  int sumUpResponseValues(List<Response> responseList, String type) =>
+      Collection(<Response>[...responseList]).aggregate$1(0, (r, e) {
+        if (e.results.collatedScores.containsKey(type))
+          return r + e.results.collatedScores[type];
+        else
+          return r + 0;
+      });
+
+  Map chartCoordsByOutcomeGender({Collection collection}) {
+    Map chartsList = {};
+    Map outcomesByGender = groupByOutcome(collection).map((key, value) {
+      return MapEntry(key, groupByGender(Collection(<Response>[...value])));
+    });
+    outcomesByGender.forEach((outcome, responsesByGender) =>
+        chartsList[outcome] =
+            groupbyToCoords(groupbyResult: responsesByGender));
+    return chartsList;
+  }
+
+  List<charts.Series<ChartCoordinates, String>> createChartData(
+      {data, context, selectedMeasure}) {
+    List<charts.Series<ChartCoordinates, String>> chartData = [];
+    data.forEach((chartName, chartInfo) =>
+        chartData.add(charts.Series<ChartCoordinates, String>(
+          id: chartName,
+          domainFn: (ChartCoordinates results, _) => results.label,
+          measureFn: (ChartCoordinates results, _) =>
+              results.values[selectedMeasure],
+          data: chartInfo,
+          labelAccessorFn: (ChartCoordinates results, _) =>
+              '${results.values[selectedMeasure]}  -   ${(results.values['percentage'] * 100).toStringAsFixed(1)}%',
+        )));
+    return chartData;
+  }
+
+  dynamic toggleChartSettings({String setting}) {
+    if (setting == 'gender')
+      return chartCoordsByOutcomeGender(collection: _responseCollection());
+    else
+      return chartCoordsByOutcome(collection: _responseCollection());
+  }
 }
 
 class ChartCoordinates {
   final String label;
-  final int number;
+  final Map values;
 
-  ChartCoordinates({this.label, this.number});
+  ChartCoordinates({this.label, this.values});
 }
 
 class SelectedChartSettings {
