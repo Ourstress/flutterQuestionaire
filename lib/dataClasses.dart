@@ -22,6 +22,8 @@ class ChartLogic {
     return result;
   }
 
+  // reference for working with collections https://github.com/mezoni/queries/blob/master/example/example.dart
+
   Map<String, List<Response>> groupByGender(Collection collection) {
     var query = collection.groupBy((response) => response.gender);
     return groupByAttribute(query);
@@ -31,6 +33,13 @@ class ChartLogic {
     var query = collection.groupBy((response) => response.results.outcome);
     return groupByAttribute(query);
   }
+
+  Map<String, List<Response>> groupBySemesters() {
+    var query = _responseCollection().groupBy((response) => response.acadSem());
+    return groupByAttribute(query);
+  }
+
+  List<String> semesterOptions() => [...groupBySemesters().keys];
 
   Map<String, List<ChartCoordinates>> chartCoordsByOutcome(
           {Collection collection}) =>
@@ -102,11 +111,19 @@ class ChartLogic {
     return chartData;
   }
 
-  Map<String, List<ChartCoordinates>> toggleChartSettings({String setting}) {
+  Map<String, List<ChartCoordinates>> toggleChartSettings(
+      {String setting, String semester}) {
+    Collection _collectionBySem() {
+      if (semester == 'all')
+        return _responseCollection();
+      else
+        return Collection([...groupBySemesters()[semester]]);
+    }
+
     if (setting == 'gender')
-      return chartCoordsByOutcomeGender(collection: _responseCollection());
+      return chartCoordsByOutcomeGender(collection: _collectionBySem());
     else
-      return chartCoordsByOutcome(collection: _responseCollection());
+      return chartCoordsByOutcome(collection: _collectionBySem());
   }
 }
 
@@ -328,6 +345,14 @@ class Response {
   final String email;
 
   Response({this.createdAt, this.gender, this.results, this.email});
+
+  String acadSem() {
+    int responseYear = createdAt.year;
+    int responseMonth = createdAt.month;
+    return responseMonth > 6
+        ? 'AY$responseYear-${responseYear + 1} sem1'
+        : 'AY${responseYear - 1}-$responseYear sem2';
+  }
 
   factory Response.fromFirestore(MapEntry responseMapEntry) {
     return Response(

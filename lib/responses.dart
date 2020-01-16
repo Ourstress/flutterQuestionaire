@@ -20,16 +20,20 @@ class _ResponsesPageState extends State<ResponsesPage> {
   void initState() {
     chartLogic = ChartLogic(quizInfo: widget.quizInfo);
     _chartData = chartLogic.createChartData(
-        data: chartLogic.toggleChartSettings(setting: 'all'),
+        data: chartLogic.toggleChartSettings(setting: 'all', semester: 'all'),
         context: context,
         selectedMeasure: 'count');
     super.initState();
   }
 
-  void changeChartDisplay({String setting = 'all', String measure = 'count'}) {
+  void changeChartDisplay(
+      {String setting = 'all',
+      String measure = 'count',
+      String semester = 'all'}) {
     setState(() {
       _chartData = chartLogic.createChartData(
-          data: chartLogic.toggleChartSettings(setting: setting),
+          data: chartLogic.toggleChartSettings(
+              setting: setting, semester: semester),
           context: context,
           selectedMeasure: measure);
     });
@@ -42,13 +46,9 @@ class _ResponsesPageState extends State<ResponsesPage> {
         body: Padding(
             padding: EdgeInsets.all(config['outermostPadding']),
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              // FlatButton is temporarily here
-              FlatButton(
-                  child: Text('hello'),
-                  onPressed: () {
-                    changeChartDisplay(setting: 'gender');
-                  }),
-              ResponseChartSettings(changeChartDisplay: changeChartDisplay),
+              ResponseChartSettings(
+                  changeChartDisplay: changeChartDisplay,
+                  semesterOptions: chartLogic.semesterOptions()),
               ChartDisplay(coords: _chartData)
             ])));
   }
@@ -56,8 +56,10 @@ class _ResponsesPageState extends State<ResponsesPage> {
 
 class ResponseChartSettings extends StatefulWidget {
   final Function changeChartDisplay;
+  final List<String> semesterOptions;
 
-  const ResponseChartSettings({Key key, this.changeChartDisplay})
+  const ResponseChartSettings(
+      {Key key, this.changeChartDisplay, this.semesterOptions})
       : super(key: key);
 
   @override
@@ -68,7 +70,9 @@ class _ResponseChartSettingsState extends State<ResponseChartSettings> {
   SelectedChartSettings selectedSettings = SelectedChartSettings();
 
   void updateChartDisplay() => widget.changeChartDisplay(
-      setting: selectedSettings.gender, measure: selectedSettings.measure);
+      setting: selectedSettings.gender,
+      measure: selectedSettings.measure,
+      semester: selectedSettings.semester);
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +96,14 @@ class _ResponseChartSettingsState extends State<ResponseChartSettings> {
               width: config['dropdownWidth'],
               child: SelectDropdown(
                   dropdownValue: () => selectedSettings.semester,
-                  setter: (value) => setState(() {
-                        selectedSettings.semester = value;
-                      }),
+                  setter: (value) {
+                    setState(() {
+                      selectedSettings.semester = value;
+                    });
+                    updateChartDisplay();
+                  },
                   labelText: config['semesterLabel'],
-                  dropdownOptions: ['dummy1', 'dummy2', 'all'])),
+                  dropdownOptions: [...widget.semesterOptions, 'all'])),
           SizedBox(
               width: config['dropdownWidth'],
               child: SelectDropdown(
