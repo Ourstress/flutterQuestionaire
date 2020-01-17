@@ -132,18 +132,22 @@ class ChartDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    charts.TextStyleSpec normalFontStyle =
+        charts.TextStyleSpec(fontSize: config['normalFontSize']);
     return Expanded(
-        child: charts.BarChart(coords,
-            // no need to supply any animation controller
-            animate: true,
-            behaviors: [
-              charts.SeriesLegend(
-                  entryTextStyle:
-                      charts.TextStyleSpec(fontSize: config['normalFontSize']))
-            ],
-            domainAxis: charts.OrdinalAxisSpec(
-                renderSpec: charts.SmallTickRendererSpec(
-                    labelStyle: charts.TextStyleSpec(
-                        fontSize: config['normalFontSize'])))));
+        child: charts.BarChart(
+      coords,
+      // no need to supply any animation controller
+      animate: true,
+      behaviors: [charts.SeriesLegend(entryTextStyle: normalFontStyle)],
+      domainAxis: charts.OrdinalAxisSpec(
+          renderSpec:
+              charts.SmallTickRendererSpec(labelStyle: normalFontStyle)),
+      barRendererDecorator: charts.BarLabelDecorator(
+        labelPosition: charts.BarLabelPosition.outside,
+        insideLabelStyleSpec: normalFontStyle,
+        outsideLabelStyleSpec: normalFontStyle,
+      ),
+    ));
   }
 }

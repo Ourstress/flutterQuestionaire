@@ -108,7 +108,7 @@ class ChartLogic {
               results.values[selectedMeasure],
           data: data.values.elementAt(i),
           labelAccessorFn: (ChartCoordinates results, _) =>
-              '${results.values[selectedMeasure]}  -   ${(results.values['percentage'] * 100).toStringAsFixed(1)}%',
+              '${results.values[selectedMeasure]}',
           colorFn: (ChartCoordinates results, _) =>
               _colorPalettes[i].shadeDefault,
         ),
