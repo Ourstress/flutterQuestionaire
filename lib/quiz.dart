@@ -13,7 +13,7 @@ class Quiz extends StatefulWidget {
   QuizState createState() => QuizState();
 }
 
-class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
+class QuizState extends State<Quiz> {
   QuizData quizData;
 
   void initState() {
@@ -50,20 +50,16 @@ class QuizState extends State<Quiz> with AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     // listening to provider in build method - see https://medium.com/flutter-community/flutter-statemanagement-with-provider-ee251bbc5ac1
     final List<QuizQuestion> questions =
         Provider.of<List<QuizQuestion>>(context);
     return Scaffold(
-        appBar: AppBar(title: Text('Quiz')),
+        appBar: AppBar(title: Text(quizData.quizInfo.title)),
         body: QuestionList(
             questions: questions,
             scoreUpdater: updateQuizScore,
             onSubmit: () => onSubmit(questions)));
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
 Future showAlert({BuildContext context, String alertMessage}) {
@@ -119,7 +115,8 @@ class QuizQnTile extends StatefulWidget {
   QuizQnTileState createState() => QuizQnTileState();
 }
 
-class QuizQnTileState extends State<QuizQnTile> {
+class QuizQnTileState extends State<QuizQnTile>
+    with AutomaticKeepAliveClientMixin {
   int radioGroupScore = -1;
 
   QuizQuestion quizQn() => widget.quizQn;
@@ -134,6 +131,8 @@ class QuizQnTileState extends State<QuizQnTile> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return ListTile(
         title: Text((widget.index + 1).toString() + '.  ' + quizQn().title),
         contentPadding: EdgeInsets.all(20.0),
@@ -147,6 +146,9 @@ class QuizQnTileState extends State<QuizQnTile> {
                     radioGroupScore: radioGroupScore,
                     clickHandler: onSelectRadio))));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 List<Column> radioButtonBar(

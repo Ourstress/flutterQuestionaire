@@ -8,7 +8,7 @@ Map config = {
   'inputEmailLabel': 'Please enter an NUS email.',
   'checkEmailRegex': r"e\d{7}@u.nus.edu$",
   'emailHintText': 'eXXXXXXX@u.nus.edu',
-  'incorrectInputEmailMsg': 'Enter something like eXXXXXXX@u.nus.edu',
+  'incorrectInputEmailMsg': 'example: eXXXXXXX@u.nus.edu',
   // for display of results
   'recordedResponseText': 'Your response has been recorded!',
   'resultTableCategoryKey': 'Category',
