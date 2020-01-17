@@ -46,6 +46,11 @@ class _ResponsesPageState extends State<ResponsesPage> {
         body: Padding(
             padding: EdgeInsets.all(config['outermostPadding']),
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+              ResultDisplayText(
+                  displayText: chartLogic.quizInfo.title,
+                  padding: config['outermostPadding'],
+                  fontWeight: FontWeight.w300,
+                  fontSize: config['normalFontSize']),
               ResponseChartSettings(
                   changeChartDisplay: changeChartDisplay,
                   semesterOptions: chartLogic.semesterOptions()),
@@ -128,9 +133,17 @@ class ChartDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: charts.BarChart(
-      coords,
-      animate: false,
-    ));
+        child: charts.BarChart(coords,
+            // no need to supply any animation controller
+            animate: true,
+            behaviors: [
+              charts.SeriesLegend(
+                  entryTextStyle:
+                      charts.TextStyleSpec(fontSize: config['normalFontSize']))
+            ],
+            domainAxis: charts.OrdinalAxisSpec(
+                renderSpec: charts.SmallTickRendererSpec(
+                    labelStyle: charts.TextStyleSpec(
+                        fontSize: config['normalFontSize'])))));
   }
 }

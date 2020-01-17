@@ -97,18 +97,22 @@ class ChartLogic {
 
   List<charts.Series<ChartCoordinates, String>> createChartData(
       {data, context, selectedMeasure}) {
-    List<charts.Series<ChartCoordinates, String>> chartData = [];
-    data.forEach((chartName, chartInfo) =>
-        chartData.add(charts.Series<ChartCoordinates, String>(
-          id: chartName,
+    final _colorPalettes =
+        charts.MaterialPalette.getOrderedPalettes(data.length);
+    return [
+      for (int i = 0; i < data.length; i++)
+        charts.Series<ChartCoordinates, String>(
+          id: data.keys.elementAt(i),
           domainFn: (ChartCoordinates results, _) => results.label,
           measureFn: (ChartCoordinates results, _) =>
               results.values[selectedMeasure],
-          data: chartInfo,
+          data: data.values.elementAt(i),
           labelAccessorFn: (ChartCoordinates results, _) =>
               '${results.values[selectedMeasure]}  -   ${(results.values['percentage'] * 100).toStringAsFixed(1)}%',
-        )));
-    return chartData;
+          colorFn: (ChartCoordinates results, _) =>
+              _colorPalettes[i].shadeDefault,
+        ),
+    ];
   }
 
   Map<String, List<ChartCoordinates>> toggleChartSettings(
