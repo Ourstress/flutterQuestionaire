@@ -2,16 +2,13 @@ import 'package:firebase/firestore.dart';
 import 'package:queries/collections.dart';
 import 'config.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
 
-class ChartLogic {
-  final QuizInfo quizInfo;
+class ChartDataBase {
+  // reference for working with collections https://github.com/mezoni/queries/blob/master/example/example.dart
 
-  ChartLogic({this.quizInfo});
-
-  Collection<Response> _responseCollection() =>
-      Collection(<Response>[...quizInfo.responseList.responses]);
-
-  Map<String, List<Response>> groupByAttribute(query) {
+  // eg after grouping by outcome, make map {outcome:[responses]}
+  _queryToMap({IEnumerable query}) {
     var result = <String, List<Response>>{};
     for (var group in query.asIterable()) {
       result[group.key] = <Response>[];
@@ -22,81 +19,95 @@ class ChartLogic {
     return result;
   }
 
-  // reference for working with collections https://github.com/mezoni/queries/blob/master/example/example.dart
+  Map _keysToLowercase(Map mapForConversion) =>
+      Map.fromEntries(mapForConversion.entries
+          .map((entry) => MapEntry(entry.key.toLowerCase(), entry.value)));
 
-  Map<String, List<Response>> groupByGender(Collection collection) {
-    var query = collection.groupBy((response) => response.gender);
-    return groupByAttribute(query);
+  List<ChartCoordinates> coordsOfCounts(
+      {Map<String, List<Response>> groupbyResult}) {
+    return groupbyResult.entries.map((entry) {
+      return ChartCoordinates(
+          label: entry.key, values: {'count': entry.value.length});
+    }).toList();
   }
 
-  Map<String, List<Response>> groupByOutcome(Collection collection) {
-    var query = collection.groupBy((response) => response.results.outcome);
-    return groupByAttribute(query);
+  Map<String, Map> collectionStats(
+      {Collection collection, List<String> categories}) {
+    Map<String, int> _totals = {};
+    Map<String, double> _averages = {};
+
+    categories.forEach(
+        (category) => _totals[category] = collection.aggregate$1(0, (r, e) {
+              Map scoresLowercase = _keysToLowercase(e.results.collatedScores);
+              if (scoresLowercase.containsKey(category))
+                return r + scoresLowercase[category];
+              else
+                return r + 0;
+            }));
+
+    _totals.forEach(
+        (outcome, count) => _averages[outcome] = count / collection.length);
+
+    return {'totals': _totals, 'averages': _averages};
   }
+
+  IEnumerable _queryResponsesByOutcome({Collection collection}) =>
+      collection.groupBy((response) => response.results.outcome);
+
+  Map<String, List<Response>> groupResponsesByOutcome(
+          {Collection collection}) =>
+      _queryToMap(query: _queryResponsesByOutcome(collection: collection));
+
+  List<String> listOfOutcomes({Collection collection}) =>
+      groupResponsesByOutcome(collection: collection).keys.toList();
+
+  Map<String, Map> outcomeStats(
+          {Collection collection, List<String> categories}) =>
+      collectionStats(collection: collection, categories: categories);
+
+  Map<String, List<ChartCoordinates>> chartCoordsByOutcome(
+          {Collection collection, String chartName}) =>
+      {
+        chartName: coordsOfCounts(
+            groupbyResult: groupResponsesByOutcome(collection: collection))
+      };
+}
+
+class ChartLogic extends ChartDataBase {
+  final QuizInfo quizInfo;
+
+  ChartLogic({this.quizInfo});
+
+  Collection<Response> _masterResponses() =>
+      Collection(<Response>[...quizInfo.responseList.responses]);
 
   Map<String, List<Response>> groupBySemesters() {
-    var query = _responseCollection().groupBy((response) => response.acadSem());
-    return groupByAttribute(query);
+    var query = _masterResponses().groupBy((response) => response.acadSem());
+    return _queryToMap(query: query);
   }
 
   List<String> semesterOptions() => [...groupBySemesters().keys];
 
-  Map<String, List<ChartCoordinates>> chartCoordsByOutcome(
-          {Collection collection}) =>
-      {
-        'outcomes':
-            groupbySingleToCoords(groupbyResult: groupByOutcome(collection))
-      };
+  Map<String, List<ChartCoordinates>> toggleChartSettings(
+      {String setting, String semester}) {
+    Collection _collectionBySem() {
+      if (semester == 'all')
+        return _masterResponses();
+      else
+        return Collection([...groupBySemesters()[semester]]);
+    }
 
-  List<ChartCoordinates> groupbySingleToCoords(
-      {Map<String, List<Response>> groupbyResult}) {
-    return groupbyResult.entries.map((entry) {
-      return ChartCoordinates(label: entry.key, values: {
-        'count': entry.value.length,
-        'average':
-            sumUpResponseValues(entry.value, entry.key) / entry.value.length
-      });
-    }).toList();
-  }
-
-  List<ChartCoordinates> groupbyDoubleToCoords(
-      {Map<String, List<Response>> groupbyResult, String outcome}) {
-    return groupbyResult.entries.map((entry) {
-      return ChartCoordinates(label: entry.key, values: {
-        'count': entry.value.length,
-        'average':
-            sumUpResponseValues(entry.value, outcome) / entry.value.length
-      });
-    }).toList();
-  }
-
-  int sumUpResponseValues(List<Response> responseList, String type) =>
-      Collection(<Response>[...responseList]).aggregate$1(0, (r, e) {
-        Map keysToLowercase(Map mapForConversion) =>
-            Map.fromEntries(mapForConversion.entries.map(
-                (entry) => MapEntry(entry.key.toLowerCase(), entry.value)));
-        Map scoresLowercase = keysToLowercase(e.results.collatedScores);
-        if (scoresLowercase.containsKey(type.toLowerCase()))
-          return r + scoresLowercase[type.toLowerCase()];
-        else
-          return r + 0;
-      });
-
-  Map<String, List<ChartCoordinates>> chartCoordsByOutcomeGender(
-      {Collection collection}) {
-    Map<String, List<ChartCoordinates>> chartsList = {};
-    Map outcomesByGender = groupByOutcome(collection).map((key, value) {
-      return MapEntry(key, groupByGender(Collection(<Response>[...value])));
-    });
-    outcomesByGender.forEach((outcome, responsesByGender) {
-      chartsList[outcome] = groupbyDoubleToCoords(
-          groupbyResult: responsesByGender, outcome: outcome);
-    });
-    return chartsList;
+    if (setting == 'gender')
+      return coordsByOutcomeThenGender(selectedCollection: _collectionBySem());
+    else
+      return chartCoordsByOutcome(
+          collection: _collectionBySem(), chartName: 'Preferred type');
   }
 
   List<charts.Series<ChartCoordinates, String>> createChartData(
-      {data, context, selectedMeasure}) {
+      {Map<String, List<ChartCoordinates>> data,
+      BuildContext context,
+      String selectedMeasure}) {
     final _colorPalettes =
         charts.MaterialPalette.getOrderedPalettes(data.length);
     return [
@@ -115,19 +126,26 @@ class ChartLogic {
     ];
   }
 
-  Map<String, List<ChartCoordinates>> toggleChartSettings(
-      {String setting, String semester}) {
-    Collection _collectionBySem() {
-      if (semester == 'all')
-        return _responseCollection();
-      else
-        return Collection([...groupBySemesters()[semester]]);
-    }
+  Map<String, Map<String, List<Response>>> _groupByOutcomeThenGender(
+          {Collection selectedCollection}) =>
+      groupResponsesByOutcome(collection: selectedCollection).map((key, value) {
+        return MapEntry(
+            key,
+            _queryToMap(
+                query: Collection(<Response>[...value])
+                    .groupBy((response) => response.gender)));
+      });
 
-    if (setting == 'gender')
-      return chartCoordsByOutcomeGender(collection: _collectionBySem());
-    else
-      return chartCoordsByOutcome(collection: _collectionBySem());
+  Map<String, List<ChartCoordinates>> coordsByOutcomeThenGender(
+      {Collection selectedCollection}) {
+    Map<String, List<ChartCoordinates>> chartsList = {};
+    _groupByOutcomeThenGender(selectedCollection: selectedCollection)
+        .forEach((outcome, outcomeGroupedByGender) {
+      List<ChartCoordinates> outcomeCoordsByGender =
+          coordsOfCounts(groupbyResult: outcomeGroupedByGender);
+      chartsList[outcome] = outcomeCoordsByGender;
+    });
+    return chartsList;
   }
 }
 
@@ -136,6 +154,11 @@ class ChartCoordinates {
   final Map values;
 
   ChartCoordinates({this.label, this.values});
+
+  @override
+  String toString() {
+    return 'label:$label, values: $values';
+  }
 }
 
 class SelectedChartSettings {
