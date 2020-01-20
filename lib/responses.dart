@@ -20,7 +20,8 @@ class _ResponsesPageState extends State<ResponsesPage> {
   void initState() {
     chartLogic = ChartLogic(quizInfo: widget.quizInfo);
     _chartData = chartLogic.createChartData(
-        data: chartLogic.toggleChartSettings(setting: 'all', semester: 'all'),
+        data: chartLogic.toggleChartSettings(
+            setting: 'all', semester: 'all', selectedMeasure: 'count'),
         context: context,
         selectedMeasure: 'count');
     super.initState();
@@ -33,7 +34,7 @@ class _ResponsesPageState extends State<ResponsesPage> {
     setState(() {
       _chartData = chartLogic.createChartData(
           data: chartLogic.toggleChartSettings(
-              setting: setting, semester: semester),
+              setting: setting, semester: semester, selectedMeasure: measure),
           context: context,
           selectedMeasure: measure);
     });
