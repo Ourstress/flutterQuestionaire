@@ -211,7 +211,9 @@ class CardContents extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(
         child: ListTile(
-      title: Text(cardData.title),
+      title: Text(cardData.title,
+          style: TextStyle(
+              fontWeight: FontWeight.w600, fontSize: config['normalFontSize'])),
       onTap: () => openQuiz(context, cardData),
     ));
   }

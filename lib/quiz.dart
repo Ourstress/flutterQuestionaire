@@ -56,9 +56,11 @@ class QuizState extends State<Quiz> {
     return Scaffold(
         appBar: AppBar(title: Text(quizData.quizInfo.title)),
         body: QuestionList(
-            questions: questions,
-            scoreUpdater: updateQuizScore,
-            onSubmit: () => onSubmit(questions)));
+          questions: questions,
+          scoreUpdater: updateQuizScore,
+          onSubmit: () => onSubmit(questions),
+          quizData: quizData,
+        ));
   }
 }
 
@@ -76,9 +78,14 @@ class QuestionList extends StatelessWidget {
   final List<QuizQuestion> questions;
   final Function scoreUpdater;
   final Function onSubmit;
+  final QuizData quizData;
 
   const QuestionList(
-      {Key key, this.questions, this.scoreUpdater, this.onSubmit})
+      {Key key,
+      this.questions,
+      this.scoreUpdater,
+      this.onSubmit,
+      this.quizData})
       : super(key: key);
 
   @override
@@ -86,6 +93,11 @@ class QuestionList extends StatelessWidget {
     return ListView(
         padding: EdgeInsets.all(config['outermostPadding']),
         children: <Widget>[
+          ResultDisplayText(
+              displayText: quizData.quizInfo.instructions,
+              padding: config['outermostPadding'],
+              fontWeight: FontWeight.w300,
+              fontSize: config['normalFontSize']),
           // list items get an index through asMap() and iterate over mapEntries to get index
           for (MapEntry qnMapEntry in questions.asMap().entries)
             Card(

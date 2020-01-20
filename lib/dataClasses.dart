@@ -390,7 +390,7 @@ class QuizQuestion {
       id: doc.id ?? '',
       quiz: data['quiz'] ?? [],
       title: data['title'] ?? '',
-      scales: data['scales'] ??
+      scales: data['scale'] ??
           '1 - Strongly disagree, 2 - Disagree, 3 - Neutral, 4 - Agree, 5 - Strongly agree',
       type: data['type'] ?? '',
     );

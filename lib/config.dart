@@ -27,7 +27,7 @@ Map config = {
   'measureOptions': ['average', 'count'],
   'genderOptions': ['gender', 'all'],
   'cardContainerMaxWidth': 400,
-  'cardContainerMinHeight': 100,
+  'cardContainerMinHeight': 75,
   'wrapCardSpacing': 15,
   'wrapCardRunSpacing': 10,
   'outermostPadding': 12,
