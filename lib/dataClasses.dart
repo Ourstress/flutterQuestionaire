@@ -266,7 +266,8 @@ class QuizData extends QuizLogic {
   Map<String, dynamic> toJson() => {
         'quizName': quizInfo.title,
         'quizOutcome': tabulateScores().outcome,
-        'quizResults': tabulateScores().tabulatedScores
+        'quizResults': tabulateScores().tabulatedScores,
+        'quizExplanation': quizInfo.resultsExplanation
       };
 }
 

@@ -5,7 +5,7 @@ Map config = {
   'genderDropdownOptions': ['male', 'female'],
   'inputGenderLabel': 'Please enter your gender',
   // for email input field
-  'inputEmailLabel': 'Please enter an NUS email.',
+  'inputEmailLabel': 'Please enter your NUS email.',
   'checkEmailRegex': r"e\d{7}@u.nus.edu$",
   'emailHintText': 'eXXXXXXX@u.nus.edu',
   'incorrectInputEmailMsg': 'example: eXXXXXXX@u.nus.edu',
@@ -23,7 +23,7 @@ Map config = {
   'semesterLabel': 'Semester',
   'measureLabel': 'Measure',
   'wrapSpacing': 20.0,
-  'dropdownWidth': 150,
+  'dropdownWidth': 200,
   'measureOptions': ['average', 'count'],
   'genderOptions': ['gender', 'all'],
   'cardContainerMaxWidth': 400,

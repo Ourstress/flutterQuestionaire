@@ -182,7 +182,7 @@ class DisplayResults extends StatelessWidget {
             fontWeight: FontWeight.w300,
             fontSize: config['normalFontSize']),
         ResultDisplayText(
-            displayText: _quizDataInfo.title,
+            displayText: 'Your preferred ' + _quizDataInfo.title + ' is:',
             padding: config['outermostPadding'],
             fontWeight: FontWeight.w600,
             fontSize: config['normalFontSize']),
