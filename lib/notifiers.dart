@@ -4,6 +4,7 @@ import 'package:firebase/firebase.dart' as fb;
 import 'package:firebase/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'config.dart';
 
 class Fa with ChangeNotifier {
   fb.Auth fbAuth = fb.auth();
@@ -18,7 +19,7 @@ class Fa with ChangeNotifier {
     });
   }
 
-  adminUserCheck(user) => isAdmin = user != null ? true : false;
+  adminUserCheck(user) => isAdmin = config['adminUsers'].contains(user.uid);
 }
 
 class Fs with ChangeNotifier {

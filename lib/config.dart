@@ -1,12 +1,16 @@
 Map config = {
   'appName': 'IS3103 App',
   'reqInfoToSubmit': 'Please help to provide us with some further information',
+  'adminUsers': [
+    'lHwx9y4dWSb6CuDmKEkvjwybUd32',
+    'ZoBNlb4QNsbjs38EUmZsBrTE0ck2'
+  ],
   // for gender select widget
   'genderDropdownOptions': ['male', 'female'],
   'inputGenderLabel': 'Please enter your gender',
   // for email input field
   'inputEmailLabel': 'Please enter your NUS email.',
-  'checkEmailRegex': r"e\d{7}@u.nus.edu$",
+  'checkEmailRegex': r"e\d{7}@u.nus.edu$", //r"[\s\S]*"
   'emailHintText': 'eXXXXXXX@u.nus.edu',
   'incorrectInputEmailMsg': 'example: eXXXXXXX@u.nus.edu',
   // for display of results
