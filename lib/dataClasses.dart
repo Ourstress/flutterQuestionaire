@@ -87,8 +87,15 @@ class ChartDataBase {
     return {'totals': _totals, 'averages': _averages};
   }
 
+  // standardise keys to lowercase first then capitalise first letter
+  String lowerThenCap(String s) {
+    String intermediateString = s.toLowerCase();
+    return intermediateString[0].toUpperCase() +
+        intermediateString.substring(1);
+  }
+
   IEnumerable _queryResponsesByOutcome({Collection collection}) =>
-      collection.groupBy((response) => response.results.outcome);
+      collection.groupBy((response) => lowerThenCap(response.results.outcome));
 
   IEnumerable _queryResponsesByGender({Collection collection}) =>
       collection.groupBy((response) => response.gender);
