@@ -46,17 +46,19 @@ class _ResponsesPageState extends State<ResponsesPage> {
         appBar: AppBar(title: Text('Responses')),
         body: Padding(
             padding: EdgeInsets.all(config['outermostPadding']),
-            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              ResultDisplayText(
-                  displayText: chartLogic.quizInfo.title,
-                  padding: config['outermostPadding'],
-                  fontWeight: FontWeight.w300,
-                  fontSize: config['normalFontSize']),
-              ResponseChartSettings(
-                  changeChartDisplay: changeChartDisplay,
-                  semesterOptions: chartLogic.semesterOptions()),
-              ChartDisplay(coords: _chartData)
-            ])));
+            child: widget.quizInfo.responseList.responses.isNotEmpty
+                ? Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                    ResultDisplayText(
+                        displayText: chartLogic.quizInfo.title,
+                        padding: config['outermostPadding'],
+                        fontWeight: FontWeight.w300,
+                        fontSize: config['normalFontSize']),
+                    ResponseChartSettings(
+                        changeChartDisplay: changeChartDisplay,
+                        semesterOptions: chartLogic.semesterOptions()),
+                    ChartDisplay(coords: _chartData)
+                  ])
+                : Text('No data to display')));
   }
 }
 
