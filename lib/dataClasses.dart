@@ -439,7 +439,7 @@ class QuizInfo {
         desc: data['desc'] ?? '',
         instructions: data['instructions'] ?? '',
         resultsExplanation: data['resultsExplanation'] ?? '',
-        responseList: ResponseList.fromFirestore(data['responseList']) ?? [],
+        responseList: ResponseList.fromFirestore(data['responseList']),
         isPublic: data['isPublic'] ?? false);
   }
 }
@@ -450,10 +450,12 @@ class ResponseList {
   ResponseList({this.responses});
 
   factory ResponseList.fromFirestore(Map responsesMap) {
-    return ResponseList(responses: [
-      for (MapEntry responseMapEntry in responsesMap.entries)
-        Response.fromFirestore(responseMapEntry)
-    ]);
+    return responsesMap != null
+        ? ResponseList(responses: [
+            for (MapEntry responseMapEntry in responsesMap.entries)
+              Response.fromFirestore(responseMapEntry)
+          ])
+        : ResponseList(responses: []);
   }
 }
 
