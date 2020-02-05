@@ -3,6 +3,7 @@ import 'forms.dart';
 import 'config.dart';
 import 'dataClasses.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:provider/provider.dart';
 
 class ResponsesPage extends StatefulWidget {
   final QuizInfo quizInfo;
@@ -17,14 +18,18 @@ class _ResponsesPageState extends State<ResponsesPage> {
   ChartLogic chartLogic;
   List<charts.Series<ChartCoordinates, String>> _chartData;
 
-  void initState() {
+  void didChangeDependencies() {
     chartLogic = ChartLogic(quizInfo: widget.quizInfo);
     _chartData = chartLogic.createChartData(
-        data: chartLogic.toggleChartSettings(
-            setting: 'all', semester: 'all', selectedMeasure: 'count'),
-        context: context,
-        selectedMeasure: 'count');
-    super.initState();
+      data: chartLogic.toggleChartSettings(
+          setting: 'all',
+          semester: 'all',
+          selectedMeasure: 'count',
+          quizQns: Provider.of<List<QuizQuestion>>(context, listen: false)),
+      context: context,
+      selectedMeasure: 'count',
+    );
+    super.didChangeDependencies();
   }
 
   void changeChartDisplay(
@@ -34,7 +39,10 @@ class _ResponsesPageState extends State<ResponsesPage> {
     setState(() {
       _chartData = chartLogic.createChartData(
           data: chartLogic.toggleChartSettings(
-              setting: setting, semester: semester, selectedMeasure: measure),
+              setting: setting,
+              semester: semester,
+              selectedMeasure: measure,
+              quizQns: Provider.of<List<QuizQuestion>>(context, listen: false)),
           context: context,
           selectedMeasure: measure);
     });

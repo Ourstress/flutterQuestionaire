@@ -107,8 +107,14 @@ class ChartDataBase {
   Map<String, List<Response>> groupResponsesByGender({Collection collection}) =>
       _queryToMap(query: _queryResponsesByGender(collection: collection));
 
-  List<String> listOfOutcomes({Collection collection}) =>
-      groupResponsesByOutcome(collection: collection).keys.toList();
+  List<String> listOfOutcomes({List<QuizQuestion> quizQns}) {
+    List<String> outcomes = [];
+    if (quizQns != null)
+      quizQns.forEach((quizQn) {
+        if (!outcomes.contains(quizQn.type)) outcomes.add(quizQn.type);
+      });
+    return outcomes;
+  }
 
   Map<String, dynamic> listOfGenders({Collection collection}) {
     Map<String, dynamic> genderInfo = {};
@@ -133,12 +139,14 @@ class ChartDataBase {
       };
 
   Map<String, List<ChartCoordinates>> chartCoordsByStats(
-          {Collection collection, String chartName}) =>
+          {Collection collection,
+          String chartName,
+          List<QuizQuestion> quizQns}) =>
       {
         chartName: coordsOfStats(
             averageScores: collectionStats(
                 collection: collection,
-                categories: listOfOutcomes(collection: collection))['averages'])
+                categories: listOfOutcomes(quizQns: quizQns))['averages'])
       };
 }
 
@@ -158,7 +166,10 @@ class ChartLogic extends ChartDataBase {
   List<String> semesterOptions() => [...groupBySemesters().keys];
 
   Map<String, List<ChartCoordinates>> toggleChartSettings(
-      {String setting, String semester, String selectedMeasure}) {
+      {String setting,
+      String semester,
+      String selectedMeasure,
+      List<QuizQuestion> quizQns}) {
     Collection _collectionBySem() {
       if (semester == 'all')
         return _masterResponses();
@@ -168,10 +179,13 @@ class ChartLogic extends ChartDataBase {
 
     if (selectedMeasure == 'average' && setting != 'gender')
       return chartCoordsByStats(
-          collection: _collectionBySem(), chartName: 'Average scores');
+          collection: _collectionBySem(),
+          chartName: 'Average scores',
+          quizQns: quizQns);
 
     if (selectedMeasure == 'average' && setting == 'gender')
-      return coordsOfStatsByGender(selectedCollection: _collectionBySem());
+      return coordsOfStatsByGender(
+          selectedCollection: _collectionBySem(), quizQns: quizQns);
 
     if (setting == 'gender')
       return coordsByOutcomeThenGender(selectedCollection: _collectionBySem());
@@ -225,11 +239,11 @@ class ChartLogic extends ChartDataBase {
   }
 
   Map<String, List<ChartCoordinates>> coordsOfStatsByGender(
-      {Collection selectedCollection}) {
+      {Collection selectedCollection, List<QuizQuestion> quizQns}) {
     Map<String, List<ChartCoordinates>> chartsList = {};
     collectionStatsByGender(
             collection: selectedCollection,
-            categories: listOfOutcomes(collection: selectedCollection),
+            categories: listOfOutcomes(quizQns: quizQns),
             genders: listOfGenders(collection: selectedCollection))['averages']
         .forEach((outcome, countGroupedByGender) {
       List<ChartCoordinates> outcomeCoordsByGender =

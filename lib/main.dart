@@ -150,8 +150,13 @@ class OpenResponsesTile extends StatelessWidget {
     var contextFirestore = Provider.of<Fs>(context, listen: false);
     Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (BuildContext context) {
-      return ChangeNotifierProvider.value(
-          value: contextFirestore, child: ResponsesPage(quizInfo: cardData));
+      return MultiProvider(providers: [
+        ChangeNotifierProvider.value(value: contextFirestore),
+        StreamProvider<List<QuizQuestion>>(
+            create: (context) => Provider.of<Fs>(context, listen: false)
+                .streamQuizQuestion(cardData.id),
+            initialData: [])
+      ], child: ResponsesPage(quizInfo: cardData));
     }));
   }
 
