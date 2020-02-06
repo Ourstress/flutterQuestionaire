@@ -47,8 +47,8 @@ class ChartDataBase {
     categories.forEach(
         (category) => _totals[category] = collection.aggregate$1(0, (r, e) {
               Map scoresLowercase = _keysToLowercase(e.results.collatedScores);
-              if (scoresLowercase.containsKey(category))
-                return r + scoresLowercase[category];
+              if (scoresLowercase.containsKey(category.toLowerCase()))
+                return r + scoresLowercase[category.toLowerCase()];
               else
                 return r + 0;
             }));
@@ -71,8 +71,9 @@ class ChartDataBase {
       genders['genderList'].forEach((gender) =>
           _totals[category][gender] = collection.aggregate$1(0, (r, e) {
             Map scoresLowercase = _keysToLowercase(e.results.collatedScores);
-            if (scoresLowercase.containsKey(category) && e.gender == gender)
-              return r + scoresLowercase[category];
+            if (scoresLowercase.containsKey(category.toLowerCase()) &&
+                e.gender == gender)
+              return r + scoresLowercase[category.toLowerCase()];
             else
               return r + 0;
           }));
