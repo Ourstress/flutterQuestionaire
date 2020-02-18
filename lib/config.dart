@@ -26,6 +26,8 @@ Map config = {
   'genderLabel': 'Gender',
   'semesterLabel': 'Semester',
   'measureLabel': 'Measure',
+  // for excluding preferred results
+  'specialCase': ['Bj2VC2Np06MwFNQobvP0'],
   'wrapSpacing': 20.0,
   'dropdownWidth': 200,
   'measureOptions': ['average', 'count'],

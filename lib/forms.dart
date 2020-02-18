@@ -173,6 +173,7 @@ class DisplayResults extends StatelessWidget {
     TabulatedScore _quizScores = quizData.tabulateScores();
     bool quizNoType() =>
         _quizScores.outcome == config['no-type-quiz-identifier'];
+    bool quizSpecialCase() => config['specialCase'].contains(_quizDataInfo.id);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -181,12 +182,14 @@ class DisplayResults extends StatelessWidget {
             padding: config['outermostPadding'],
             fontWeight: FontWeight.w300,
             fontSize: config['normalFontSize']),
-        ResultDisplayText(
-            displayText: 'Your preferred ' + _quizDataInfo.title + ' is:',
-            padding: config['outermostPadding'],
-            fontWeight: FontWeight.w600,
-            fontSize: config['normalFontSize']),
-        quizNoType()
+        quizSpecialCase()
+            ? SizedBox()
+            : ResultDisplayText(
+                displayText: 'Your preferred ' + _quizDataInfo.title + ' is:',
+                padding: config['outermostPadding'],
+                fontWeight: FontWeight.w600,
+                fontSize: config['normalFontSize']),
+        quizNoType() || quizSpecialCase()
             ? SizedBox()
             : ResultDisplayText(
                 displayText: _quizScores.outcome,
