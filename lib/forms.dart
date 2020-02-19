@@ -174,7 +174,8 @@ class DisplayResults extends StatelessWidget {
     bool quizNoType() =>
         _quizScores.outcome == config['no-type-quiz-identifier'];
     bool quizSpecialCase() => config['specialCase'].contains(_quizDataInfo.id);
-    return Column(
+    return SingleChildScrollView(
+        child: Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ResultDisplayText(
@@ -232,7 +233,7 @@ class DisplayResults extends StatelessWidget {
                 ],
               )
       ],
-    );
+    ));
   }
 }
 
