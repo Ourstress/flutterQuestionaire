@@ -150,10 +150,13 @@ class ChartDisplay extends StatelessWidget {
       coords,
       // no need to supply any animation controller
       animate: true,
-      behaviors: [charts.SeriesLegend(entryTextStyle: normalFontStyle)],
+      behaviors: [
+        charts.SeriesLegend(
+            entryTextStyle: normalFontStyle, desiredMaxColumns: 3)
+      ],
       domainAxis: charts.OrdinalAxisSpec(
-          renderSpec:
-              charts.SmallTickRendererSpec(labelStyle: normalFontStyle)),
+          renderSpec: charts.SmallTickRendererSpec(
+              labelStyle: normalFontStyle, labelRotation: 10)),
       barRendererDecorator: charts.BarLabelDecorator(
         labelPosition: charts.BarLabelPosition.outside,
         insideLabelStyleSpec: normalFontStyle,
